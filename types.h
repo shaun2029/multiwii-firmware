@@ -128,6 +128,7 @@ typedef struct {
   uint8_t SMALL_ANGLES_25 :1 ;
   uint8_t CALIBRATE_MAG :1 ;
   uint8_t VARIO_MODE :1;
+  uint8_t EVER_ARMED :1;
 } flags_struct_t;
 
 typedef struct {

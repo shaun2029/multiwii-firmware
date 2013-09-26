@@ -710,6 +710,7 @@ void go_arm() {
     ) {
     if(!f.ARMED && !f.BARO_MODE) { // arm now!
       f.ARMED = 1;
+      f.EVER_ARMED = 1;
       #if defined(HEADFREE)
         headFreeModeHold = att.heading;
       #endif

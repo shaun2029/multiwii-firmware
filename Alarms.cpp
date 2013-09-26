@@ -71,7 +71,7 @@ void alarmHandler(void){
   #endif  
      
   #if defined(FAILSAFE)
-    if ( failsafeCnt > (5*FAILSAFE_DELAY) && f.ARMED) {
+    if ( failsafeCnt > (5*FAILSAFE_DELAY) && f.ARMED && f.EVER_ARMED) {
       alarmArray[1] = 1;                                                                   //set failsafe warning level to 1 while landing
       if (failsafeCnt > 5*(FAILSAFE_DELAY+FAILSAFE_OFF_DELAY)) alarmArray[1] = 2;          //start "find me" signal after landing   
     }
