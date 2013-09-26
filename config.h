@@ -689,6 +689,7 @@
        Note the sign on declination it could be negative or positive (WEST or EAST) */
     //#define MAG_DECLINATION  3.96f              //For Budapest Hungary.
     #define MAG_DECLINATION  -0.56f               // Gillingham, Kent, England
+    #define MAG_OFFSET 180                        // Compensate for board layout
 
     #define GPS_LEAD_FILTER                      // Adds a forward predictive filterig to compensate gps lag. Code based on Jason Short's lead filter implementation
     
@@ -812,8 +813,8 @@
     #define VBAT              // uncomment this line to activate the vbat code
     #define VBATSCALE       77 //131 (*) change this value if readed Battery voltage is different than real voltage
     #define VBATNOMINAL     84 // 8.4V full battery nominal voltage - only used for lcd.telemetry
-    #define VBATLEVEL_WARN1  66 // (*) 10,7V
-    #define VBATLEVEL_WARN2  64 // (*) 6.6V
+    #define VBATLEVEL_WARN1  66 // (*) 6.6V
+    #define VBATLEVEL_WARN2  64 // (*) 6.4V
     #define VBATLEVEL_CRIT   62 // (*) 6.2V - critical condition: if vbat ever goes below this value, permanent alarm is triggered
     #define NO_VBAT          38  // (*) Avoid beeping without any battery 
 
