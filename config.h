@@ -814,8 +814,8 @@
     #define VBAT              // uncomment this line to activate the vbat code
     #define VBATSCALE       77 //131 (*) change this value if readed Battery voltage is different than real voltage
     #define VBATNOMINAL     84 // 8.4V full battery nominal voltage - only used for lcd.telemetry
-    #define VBATLEVEL_WARN1  68 // (*) 10,7V
-    #define VBATLEVEL_WARN2  66 // (*) 6.6V
+    #define VBATLEVEL_WARN1  66 // (*) 10,7V
+    #define VBATLEVEL_WARN2  64 // (*) 6.6V
     #define VBATLEVEL_CRIT   62 // (*) 6.2V - critical condition: if vbat ever goes below this value, permanent alarm is triggered
     #define NO_VBAT          38  // (*) Avoid beeping without any battery 
 
