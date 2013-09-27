@@ -239,7 +239,7 @@ void getEstimatedAttitude(){
     att.heading += conf.mag_declination; // Set from GUI
 
     //ShaunS Compensate for board orientation
-    heading += MAG_OFFSET * 10;
+    att.heading += MAG_OFFSET * 10;
          
     att.heading /= 10;
   #endif
