@@ -441,7 +441,7 @@
 
   /* only enable any of this if you must change the default pin assignment, e.g. your board does not have a specific pin */
   /* you may need to change PINx and PORTx plus #shift according to the desired pin! */
-  #define OVERRIDE_V_BATPIN                   A0 // instead of A3    // Analog PIN 3
+  #define OVERRIDE_V_BATPIN                   A7 // instead of A3    // Analog PIN 3
 
   //#define OVERRIDE_PSENSORPIN                 A1 // instead of A2    // Analog PIN 2
 
