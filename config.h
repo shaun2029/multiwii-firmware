@@ -215,13 +215,15 @@
   /********************************  PID Controller *********************************/
     /* choose one of the alternate PID control algorithms
      * 1 = evolved oldschool algorithm (similar to v2.2)
-     * 2 = new experimental algorithm from Alex Khoroshko http://www.multiwii.com/forum/viewtopic.php?f=8&t=3671&start=10#p37387
+     * 2 = new experimental algorithm from Alex Khoroshko - unsupported - http://www.multiwii.com/forum/viewtopic.php?f=8&t=3671&start=10#p37387
      * */
     #define PID_CONTROLLER 1
 
     /* NEW: not used anymore for servo coptertypes  <== NEEDS FIXING - MOVE TO WIKI */
     #define YAW_DIRECTION 1
     //#define YAW_DIRECTION -1 // if you want to reverse the yaw correction direction
+
+    #define ONLYARMWHENFLAT //prevent the copter from arming when the copter is tilted
 
    /********************************    ARM/DISARM    *********************************/
    /* optionally disable stick combinations to arm/disarm the motors.
@@ -230,9 +232,9 @@
     //#define ALLOW_ARM_DISARM_VIA_TX_ROLL
 
     /********************************    SERVOS      *********************************/
-    /* temporary info on which servos connect where is here
-     * http://www.multiwii.com/forum/viewtopic.php?f=8&t=3498 <== NEEDS FIXING - MOVE TO WIKI
-     * http://www.multiwii.com/forum/viewtopic.php?f=8&t=3498&start=30#p36023  <== NEEDS FIXING - MOVE TO WIKI  */
+    /* info on which servos connect where and how to setup can be found here
+     * http://www.multiwii.com/wiki/index.php?title=Config.h#Servos_configuration
+     */
 
 
     /* if you want to preset min/middle/max values for servos right after flashing, because of limited physical
@@ -305,7 +307,7 @@
   /***********************      your individual defaults     ***********************/
     /* if you want to replace the hardcoded default values with your own (e.g. from a previous save to an .mwi file),
      * you may want to avoid editing the LoadDefaults() function for every version again and again.
-     * howto: http://www.multiwii.com/forum/viewtopic.php?f=8&t=3987
+     * http://www.multiwii.com/wiki/index.php?title=Config.h#Individual_defaults
      */
     //#define MY_PRIVATE_DEFAULTS "filename.h"
 
@@ -656,13 +658,6 @@
     //#define I2C_GPS
     // If your I2C GPS board has Sonar support enabled
     //#define I2C_GPS_SONAR
-
-    /* I2C GPS device made with an indeedent ATTiny[24]313 + GPS device and
-       optional sonar device.    https://github.com/wertarbyte/tiny-gps/ */
-    /* get GPS data from Tiny-GPS */
-    //#define TINY_GPS
-    /* get sonar data from Tiny-GPS */
-    //#define TINY_GPS_SONAR
 
     /* GPS data readed from Misio-OSD - GPS module connected to OSD, and MultiWii read GPS data from OSD - tested and working OK ! */
     //#define GPS_FROM_OSD
@@ -1043,7 +1038,7 @@
        example: with cycle time of approx 3ms, do action every 6*3ms=18ms
        value must be [1; 65535] */
     #define LCD_TELEMETRY_FREQ 23       // to send telemetry data over serial 23 <=> 60ms <=> 16Hz (only sending interlaced, so 8Hz update rate)
-    #define LCD_TELEMETRY_AUTO_FREQ 1967// to step to next telemetry page 967 <=> 3s
+    #define LCD_TELEMETRY_AUTO_FREQ  967// to step to next telemetry page 967 <=> 3s
     #define PSENSOR_SMOOTH 16           // len of averaging vector for smoothing the PSENSOR readings; should be power of 2; set to 1 to disable
     #define VBAT_SMOOTH 16              // len of averaging vector for smoothing the VBAT readings; should be power of 2; set to 1 to disable
     #define RSSI_SMOOTH 16              // len of averaging vector for smoothing the RSSI readings; should be power of 2; set to 1 to disable

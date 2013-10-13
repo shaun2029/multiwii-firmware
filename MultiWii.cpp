@@ -655,7 +655,7 @@ void setup() {
   #endif
   /************************************/
  
-  #if defined(I2C_GPS) || defined(TINY_GPS) || defined(GPS_FROM_OSD)
+  #if defined(I2C_GPS) || defined(GPS_FROM_OSD)
    GPS_Enable = 1;
   #endif
   
@@ -696,7 +696,10 @@ void setup() {
 }
 
 void go_arm() {
-  if(calibratingG == 0 && f.ACC_CALIBRATED 
+  if(calibratingG == 0
+  #if defined(ONLYARMWHENFLAT)
+    && f.ACC_CALIBRATED 
+  #endif
   #if defined(FAILSAFE)
     && failsafeCnt < 2
   #endif

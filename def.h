@@ -1615,13 +1615,13 @@
   #define GPS_PROMINI
 #endif
 
-#if defined(GPS_SERIAL)  || defined(I2C_GPS) || defined(GPS_FROM_OSD) || defined(TINY_GPS)
+#if defined(GPS_SERIAL)  || defined(I2C_GPS) || defined(GPS_FROM_OSD)
   #define GPS 1
 #else
   #define GPS 0
 #endif
 
-#if defined(SRF02) || defined(SRF08) || defined(SRF10) || defined(SRC235) || defined(TINY_GPS_SONAR) || defined(I2C_GPS_SONAR)
+#if defined(SRF02) || defined(SRF08) || defined(SRF10) || defined(SRC235) || defined(I2C_GPS_SONAR)
   #define SONAR 1
 #else
   #define SONAR 0
@@ -1671,7 +1671,7 @@
 #if !defined(ACC_1G)
   #define ACC_1G 256
 #endif
-#define ACC_25deg    (uint16_t)(ACC_1G * 0.423)
+#define ACCZ_25deg   (int16_t)(ACC_1G * 0.90631) // 0.90631 = cos(25deg) (cos(theta) of accZ comparison)
 #define ACC_VelScale (9.80665f / 10000.0f / ACC_1G)
 
 #if defined(ITG3200)
