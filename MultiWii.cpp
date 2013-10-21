@@ -364,9 +364,9 @@ void annexCode() { // this code is excetuted at each loop and won't interfere wi
     if (rcData[axis]<MIDRC) rcCommand[axis] = -rcCommand[axis];
   }
   tmp = constrain(rcData[THROTTLE],MINCHECK,2000);
-  tmp = (uint32_t)(tmp-MINCHECK)*1000/(2000-MINCHECK); // [MINCHECK;2000] -> [0;1000]
-  tmp2 = tmp/100;
-  rcCommand[THROTTLE] = lookupThrottleRC[tmp2] + (tmp-tmp2*100) * (lookupThrottleRC[tmp2+1]-lookupThrottleRC[tmp2]) / 100; // [0;1000] -> expo -> [conf.minthrottle;MAXTHROTTLE]
+  tmp = (uint32_t)(tmp-MINCHECK)*999/(2000-MINCHECK); // [MINCHECK;2000] -> [0;999]
+  tmp2 = tmp/100; // range [0;9]
+  rcCommand[THROTTLE] = lookupThrottleRC[tmp2] + (tmp-tmp2*100) * (lookupThrottleRC[tmp2+1]-lookupThrottleRC[tmp2]) / 100; // [0;999] -> expo -> [conf.minthrottle;MAXTHROTTLE]
 
   if(f.HEADFREE_MODE) { //to optimize
     float radDiff = (att.heading - headFreeModeHold) * 0.0174533f; // where PI/180 ~= 0.0174533
@@ -828,13 +828,15 @@ void loop () {
     
     // perform actions    
     if (rcData[THROTTLE] <= MINCHECK) {            // THROTTLE at minimum
-      errorGyroI[ROLL] = 0; errorGyroI[PITCH] = 0;
-      #if PID_CONTROLLER == 1
-        errorGyroI_YAW = 0;
-      #elif PID_CONTROLLER == 2
-        errorGyroI[YAW] = 0;
+      #if !defined(FIXEDWING)
+        errorGyroI[ROLL] = 0; errorGyroI[PITCH] = 0;
+        #if PID_CONTROLLER == 1
+          errorGyroI_YAW = 0;
+        #elif PID_CONTROLLER == 2
+          errorGyroI[YAW] = 0;
+        #endif
+        errorAngleI[ROLL] = 0; errorAngleI[PITCH] = 0;
       #endif
-      errorAngleI[ROLL] = 0; errorAngleI[PITCH] = 0;
       if (conf.activate[BOXARM] > 0) {             // Arming/Disarming via ARM BOX
         if ( rcOptions[BOXARM] && f.OK_TO_ARM ) go_arm(); else if (f.ARMED) go_disarm();
       }
