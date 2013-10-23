@@ -64,7 +64,7 @@
 
   /****************************    Motor maxthrottle    *******************************/
     /* this is the maximum value for the ESCs at full power, this value can be increased up to 2000 */
-    #define MAXTHROTTLE 2000
+    #define MAXTHROTTLE 1850
 
   /****************************    Mincommand          *******************************/
     /* this is the value for the ESCs when they are not armed
@@ -485,8 +485,8 @@
          IMPORTANT! Change low pass filter setting changes PID behaviour, so retune your PID's after changing LPF.*/
       //#define ITG3200_LPF_256HZ     // This is the default setting, no need to uncomment, just for reference
       //#define ITG3200_LPF_188HZ
-      #define ITG3200_LPF_98HZ
-      //#define ITG3200_LPF_42HZ
+      //#define ITG3200_LPF_98HZ
+      #define ITG3200_LPF_42HZ
       //#define ITG3200_LPF_20HZ
       //#define ITG3200_LPF_10HZ      // Use this only in extreme cases, rather change motors and/or props
 
@@ -808,9 +808,9 @@
     #define VBAT              // uncomment this line to activate the vbat code
     #define VBATSCALE       77 //131 (*) change this value if readed Battery voltage is different than real voltage
     #define VBATNOMINAL     84 // 8.4V full battery nominal voltage - only used for lcd.telemetry
-    #define VBATLEVEL_WARN1  66 // (*) 6.6V
+    #define VBATLEVEL_WARN1  65 // (*) 6.5V
     #define VBATLEVEL_WARN2  64 // (*) 6.4V
-    #define VBATLEVEL_CRIT   62 // (*) 6.2V - critical condition: if vbat ever goes below this value, permanent alarm is triggered
+    #define VBATLEVEL_CRIT   63 // (*) 6.3V - critical condition: if vbat ever goes below this value, permanent alarm is triggered
     #define NO_VBAT          38  // (*) Avoid beeping without any battery 
 
   /********************************************************************/
