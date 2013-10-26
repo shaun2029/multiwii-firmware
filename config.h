@@ -64,7 +64,7 @@
 
   /****************************    Motor maxthrottle    *******************************/
     /* this is the maximum value for the ESCs at full power, this value can be increased up to 2000 */
-    #define MAXTHROTTLE 1850
+    #define MAXTHROTTLE 2000  //1850 default for multicopters
 
   /****************************    Mincommand          *******************************/
     /* this is the value for the ESCs when they are not armed
@@ -484,9 +484,9 @@
          balancing options ran out. Uncomment only one option!
          IMPORTANT! Change low pass filter setting changes PID behaviour, so retune your PID's after changing LPF.*/
       //#define ITG3200_LPF_256HZ     // This is the default setting, no need to uncomment, just for reference
-      //#define ITG3200_LPF_188HZ
+      #define ITG3200_LPF_188HZ
       //#define ITG3200_LPF_98HZ
-      #define ITG3200_LPF_42HZ
+      //#define ITG3200_LPF_42HZ
       //#define ITG3200_LPF_20HZ
       //#define ITG3200_LPF_10HZ      // Use this only in extreme cases, rather change motors and/or props
 
