@@ -13,7 +13,7 @@ bool GPS_newFrame(char c);
 #if defined(NMEA)
   bool GPS_NMEA_newFrame(char c);
 #endif
-#if defined(UBLOX)
+#if defined(UBLOX) || defined(I2C_GPS_UBLOX)
   bool GPS_UBLOX_newFrame(uint8_t data);
   bool UBLOX_parse_gps(void);
 #endif
@@ -45,11 +45,11 @@ int32_t wrap_36000(int32_t ang);
   #define SBAS_TEST_MODE          PSTR("$PMTK319,0*25\r\n")  //Enable test use of sbas satelite in test mode (usually PRN124 is in test mode)
 #endif
 
-#if defined(GPS_SERIAL) || defined(GPS_FROM_OSD)
+#if defined(GPS_SERIAL) || defined(GPS_FROM_OSD) || defined(I2C_GPS_UBLOX)
 
 #if defined(GPS_LEAD_FILTER)
 // Set up gps lag
-#if defined(UBLOX)
+#if defined(UBLOX) || defined(I2C_GPS_UBLOX)
   #define GPS_LAG 0.5f                          //UBLOX GPS has a smaller lag than MTK and other
 #else 
   #define GPS_LAG 1.0f                          //We assumes that MTK GPS has a 1 sec lag
@@ -234,8 +234,8 @@ static int16_t nav_takeoff_bearing;
   }
 #endif 
 
-#if defined(GPS_SERIAL) 
- #if defined(INIT_MTK_GPS) || defined(UBLOX)
+#if defined(GPS_SERIAL) || defined(I2C_GPS_UBLOX)
+  #if defined(INIT_MTK_GPS) || defined(UBLOX)
   uint32_t init_speed[5] = {9600,19200,38400,57600,115200};
   void SerialGpsPrint(const char PROGMEM * str) {
     char b;
@@ -246,9 +246,49 @@ static int16_t nav_takeoff_bearing;
       #endif      
     }
   }
- #endif
- #if defined(UBLOX)
-   prog_char UBLOX_INIT[] PROGMEM = {                          // PROGMEM array must be outside any function !!!
+  #endif
+
+
+  #if defined(I2C_GPS_UBLOX)
+  // Longer timout than waitTransmissionI2C becuse NEO-M6 is slow to respond
+  void waitUbloxTransmissionI2C() {
+    uint16_t count = 16000;
+    while (!(TWCR & (1<<TWINT))) {
+      count--;
+      if (count==0) {              //we are in a blocking state => we don't insist
+        TWCR = 0;                  //and we force a reset on TWINT register
+        i2c_errors_count++;
+        break;
+      }
+    }
+  }
+  
+  void ublox_i2c_rep_start(uint8_t address) {
+    TWCR = (1<<TWINT) | (1<<TWSTA) | (1<<TWEN) ; // send REPEAT START condition
+    waitUbloxTransmissionI2C();                       // wait until transmission completed
+    TWDR = address;                              // send device address
+    TWCR = (1<<TWINT) | (1<<TWEN);
+    waitUbloxTransmissionI2C();                       // wail until transmission completed
+  }
+  
+  void ublox_i2c_write(uint8_t data ) {
+    TWDR = data;                                 // send data to the previously addressed device
+    TWCR = (1<<TWINT) | (1<<TWEN);
+    waitUbloxTransmissionI2C();
+  }
+  
+  uint8_t ublox_i2c_read(uint8_t ack) {
+    TWCR = (1<<TWINT) | (1<<TWEN) | (ack? (1<<TWEA) : 0);
+    waitUbloxTransmissionI2C();
+    uint8_t r = TWDR;
+    if (!ack) i2c_stop();
+    return r;
+  }
+  #endif
+
+ 
+ #if defined(UBLOX) || defined(I2C_GPS_UBLOX) 
+   const uint8_t PROGMEM UBLOX_INIT[] PROGMEM = {                          // PROGMEM array must be outside any function !!!
      0xB5,0x62,0x06,0x01,0x03,0x00,0xF0,0x05,0x00,0xFF,0x19,                            //disable all default NMEA messages
      0xB5,0x62,0x06,0x01,0x03,0x00,0xF0,0x03,0x00,0xFD,0x15,
      0xB5,0x62,0x06,0x01,0x03,0x00,0xF0,0x01,0x00,0xFB,0x11,
@@ -265,7 +305,9 @@ static int16_t nav_takeoff_bearing;
  #endif
 
   void GPS_SerialInit(void) {
+    #if defined(GPS_SERIAL)
     SerialOpen(GPS_SERIAL,GPS_BAUD);
+    #endif
     delay(1000);
     #if defined(UBLOX)
       for(uint8_t i=0;i<5;i++){
@@ -290,6 +332,15 @@ static int16_t nav_takeoff_bearing;
         SerialWrite(GPS_SERIAL, pgm_read_byte(UBLOX_INIT+i));
         delay(5); //simulating a 38400baud pace (or less), otherwise commands are not accepted by the device.
       }
+    #elif defined(I2C_GPS_UBLOX)
+      TWBR = ((F_CPU / 100000L) - 16) / 2;       // change the I2C clock rate to 100Khz (UBLOX does not support any higher)
+      
+      ublox_i2c_rep_start(I2C_GPS_UBLOX_ADDRESS<<1);
+      for(uint8_t i=0; i<sizeof(UBLOX_INIT); i++) {                        // send configuration data in UBX protocol 
+            ublox_i2c_write(pgm_read_byte(UBLOX_INIT+i));   
+      } 
+      i2c_stop();
+      TWBR = ((F_CPU / I2C_SPEED) - 16) / 2;       // change the I2C clock rate back to default
     #elif defined(INIT_MTK_GPS)                              // MTK GPS setup
       for(uint8_t i=0;i<5;i++){
         SerialOpen(GPS_SERIAL,init_speed[i]);                // switch UART speed for sending SET BAUDRATE command
@@ -333,6 +384,7 @@ static int16_t nav_takeoff_bearing;
 
 void GPS_NewData(void) {
   uint8_t axis;
+
   #if defined(I2C_GPS)
     static uint8_t GPS_pids_initialized;
     static uint8_t _i2c_gps_status;
@@ -465,12 +517,45 @@ void GPS_NewData(void) {
     }
   #endif     
 
-  #if defined(GPS_SERIAL) || defined(GPS_FROM_OSD)
+  #if defined(GPS_SERIAL) || defined(GPS_FROM_OSD) || defined(I2C_GPS_UBLOX)
     #if defined(GPS_SERIAL)
     uint8_t c = SerialAvailable(GPS_SERIAL);
     while (c--) {
     //while (SerialAvailable(GPS_SERIAL)) {
       if (GPS_newFrame(SerialRead(GPS_SERIAL))) {
+    #elif defined(I2C_GPS_UBLOX)
+    uint16_t c = 0;
+    uint16_t buf[2];
+    uint32_t ublox_timeout = millis() + 2; // 2ms timout
+    
+    TWBR = ((F_CPU / 100000L) - 16) / 2;       // change the I2C clock rate to 100Khz (UBLOX does not support any higher)
+
+    ublox_i2c_rep_start(I2C_GPS_UBLOX_ADDRESS<<1);
+    ublox_i2c_write(0xFD);
+    ublox_i2c_rep_start((I2C_GPS_UBLOX_ADDRESS<<1)|1);
+    buf[0] = ublox_i2c_read(1);
+    buf[1] = ublox_i2c_read(0);
+    
+    c = ((uint16_t) buf[0] << 8) | buf[1];
+
+    bool new_frame = false;
+  
+    if (c) {
+      ublox_i2c_rep_start(I2C_GPS_UBLOX_ADDRESS<<1);
+      ublox_i2c_write(0xFF);         
+      ublox_i2c_rep_start((I2C_GPS_UBLOX_ADDRESS<<1)|1);
+
+      while (c--) {
+        if (ublox_timeout < millis()) c = 0;    // Only read until timout to prevent stall
+
+        // Ack all but last byte 
+        if (GPS_newFrame(ublox_i2c_read(c))) new_frame = true;
+      }
+    }
+
+    TWBR = ((F_CPU / I2C_SPEED) - 16) / 2;       // change the I2C clock rate back to default
+
+   if (new_frame) {    
     #elif defined(GPS_FROM_OSD)
     {
       if(GPS_update & 2) {  // Once second bit of GPS_update is set, indicate new GPS datas is readed from OSD - all in right format.
@@ -568,7 +653,9 @@ void GPS_NewData(void) {
           } //end of gps calcs  
         }
       }
-    }
+    #if !defined(I2C_GPS_UBLOX) 
+    } 
+    #endif
   #endif
 }
 
@@ -673,7 +760,7 @@ int32_t wrap_18000(int32_t ang) {
 
 
 //OK here is the onboard GPS code
-#if defined(GPS_SERIAL) || defined(GPS_FROM_OSD)
+#if defined(GPS_SERIAL) || defined(GPS_FROM_OSD) || defined(I2C_GPS_UBLOX)
 
 ////////////////////////////////////////////////////////////////////////////////////
 //PID based GPS navigation functions
@@ -909,7 +996,7 @@ int32_t wrap_36000(int32_t ang) {
 }
 
 // This code is used for parsing NMEA data
-#if defined(GPS_SERIAL)
+#if defined(GPS_SERIAL) || defined(I2C_GPS_UBLOX)
 
 /* Alex optimization 
   The latitude or longitude is coded this way in NMEA frames
@@ -1007,7 +1094,7 @@ bool GPS_newFrame(char c) {
   #if defined(NMEA)
     return GPS_NMEA_newFrame(c);
   #endif
-  #if defined(UBLOX)
+  #if defined(UBLOX) || defined(I2C_GPS_UBLOX)
     return GPS_UBLOX_newFrame(c);
   #endif
   #if defined(MTK_BINARY16) || defined(MTK_BINARY19)
@@ -1076,7 +1163,7 @@ bool GPS_newFrame(char c) {
   }
 #endif //NMEA
 
-#if defined(UBLOX)
+#if defined(UBLOX) || defined(I2C_GPS_UBLOX)
   struct ubx_header {
     uint8_t preamble1;
     uint8_t preamble2;
@@ -1191,7 +1278,7 @@ bool GPS_newFrame(char c) {
 
     switch(_step) {
       case 1:
-        if (PREAMBLE2 == data) {
+       if (PREAMBLE2 == data) {
           _step++;
           break;
         }

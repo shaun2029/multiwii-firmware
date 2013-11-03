@@ -1358,7 +1358,7 @@
   #define ITG3200
   #define BMA180
   #define HMC5883 
-  #define BMP085 
+  #define BMP085
   #define ACC_ORIENTATION(X, Y, Z) {imu.accADC[ROLL]  = -X; imu.accADC[PITCH]  = -Y; imu.accADC[YAW]  =  Z;} 
   #define GYRO_ORIENTATION(X, Y, Z){imu.gyroADC[ROLL] =  Y; imu.gyroADC[PITCH] = -X; imu.gyroADC[YAW] = -Z;} 
   #define MAG_ORIENTATION(X, Y, Z) {imu.magADC[ROLL]  =  X; imu.magADC[PITCH]  =  Y; imu.magADC[YAW]  = -Z;} 
@@ -1626,7 +1626,7 @@
   #define GPS_PROMINI
 #endif
 
-#if defined(GPS_SERIAL)  || defined(I2C_GPS) || defined(GPS_FROM_OSD)
+#if defined(GPS_SERIAL)  || defined(I2C_GPS) || defined(GPS_FROM_OSD) || defined(I2C_GPS_UBLOX)
   #define GPS 1
 #else
   #define GPS 0
@@ -1846,6 +1846,15 @@
   #define RC_CHANS 8
 #endif
 
+
+
+/**************************************************************************************/
+/***************                       I2C GPS                     ********************/
+/**************************************************************************************/
+#if defined(I2C_GPS_UBLOX)
+  #define I2C_GPS_UBLOX_ADDRESS                         0x42 //7 bits
+  #undef UBLOX  
+#endif
 
 /**************************************************************************************/
 /***************                       I2C GPS                     ********************/

@@ -662,6 +662,9 @@
     // If your I2C GPS board has Sonar support enabled
     //#define I2C_GPS_SONAR
 
+    // Communicate with UBLOX GPS via I2C
+    #define I2C_GPS_UBLOX //Don't define UBLOX
+
     /* GPS data readed from Misio-OSD - GPS module connected to OSD, and MultiWii read GPS data from OSD - tested and working OK ! */
     //#define GPS_FROM_OSD
 

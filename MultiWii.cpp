@@ -619,7 +619,7 @@ void setup() {
     initOpenLRS();
   #endif
   initSensors();
-  #if defined(I2C_GPS) || defined(GPS_SERIAL) || defined(GPS_FROM_OSD)
+  #if defined(I2C_GPS) || defined(GPS_SERIAL) || defined(GPS_FROM_OSD) || defined(I2C_GPS_UBLOX)
     GPS_set_pids();
   #endif
   previousTime = micros();
@@ -652,6 +652,20 @@ void setup() {
   #endif
   /************************************/
  
+  #if defined(I2C_GPS_UBLOX)
+    GPS_SerialInit();
+/*
+    for(uint8_t j=0;j<=5;j++){
+      GPS_NewData(); 
+      LEDPIN_ON
+      delay(20);
+      LEDPIN_OFF
+      delay(80);
+    }
+*/
+    GPS_Enable = 1;    
+  #endif
+
   #if defined(I2C_GPS) || defined(GPS_FROM_OSD)
    GPS_Enable = 1;
   #endif
