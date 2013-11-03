@@ -297,9 +297,9 @@
     #define PINMODE_LCD                pinMode(0, OUTPUT);
     #define LCDPIN_OFF                 PORTD &= ~1; //switch OFF digital PIN 0
     #define LCDPIN_ON                  PORTD |= 1;
-    #define STABLEPIN_PINMODE          ;
-    #define STABLEPIN_ON               ;
-    #define STABLEPIN_OFF              ;
+    #define STABLEPIN_PINMODE          pinMode(A0,OUTPUT);
+    #define STABLEPIN_ON               PORTC &= ~(1<<0);  //GPS LED Indicator ON PIN A0
+    #define STABLEPIN_OFF              PORTC |= 1<<0;     //GPS LED Indicator OFF PIN A0
   #endif 
   #define PPM_PIN_INTERRUPT          attachInterrupt(0, rxInt, RISING); //PIN 0
   #define SPEK_SERIAL_PORT           0
