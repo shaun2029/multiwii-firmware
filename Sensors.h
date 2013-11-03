@@ -35,5 +35,13 @@ uint8_t i2c_readReg(uint8_t add, uint8_t reg);
 uint8_t i2c_readAck();
 uint8_t i2c_readNak();
 
+// I2C slow functions have a much longer timout. This is to support
+// the U-blox NEO-M6 GPS over I2C. It can be slow to respond.
+bool waitTransmissionI2C_slow(void);
+bool i2c_rep_start_slow(uint8_t address);
+bool i2c_write_slow(uint8_t data);
+bool i2c_read_slow(uint8_t ack, uint8_t *data);
+
+
 
 #endif /* SENSORS_H_ */

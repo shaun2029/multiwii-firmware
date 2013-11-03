@@ -248,45 +248,6 @@ static int16_t nav_takeoff_bearing;
   }
   #endif
 
-
-  #if defined(I2C_GPS_UBLOX)
-  // Longer timout than waitTransmissionI2C becuse NEO-M6 is slow to respond
-  void waitUbloxTransmissionI2C() {
-    uint16_t count = 16000;
-    while (!(TWCR & (1<<TWINT))) {
-      count--;
-      if (count==0) {              //we are in a blocking state => we don't insist
-        TWCR = 0;                  //and we force a reset on TWINT register
-        i2c_errors_count++;
-        break;
-      }
-    }
-  }
-  
-  void ublox_i2c_rep_start(uint8_t address) {
-    TWCR = (1<<TWINT) | (1<<TWSTA) | (1<<TWEN) ; // send REPEAT START condition
-    waitUbloxTransmissionI2C();                       // wait until transmission completed
-    TWDR = address;                              // send device address
-    TWCR = (1<<TWINT) | (1<<TWEN);
-    waitUbloxTransmissionI2C();                       // wail until transmission completed
-  }
-  
-  void ublox_i2c_write(uint8_t data ) {
-    TWDR = data;                                 // send data to the previously addressed device
-    TWCR = (1<<TWINT) | (1<<TWEN);
-    waitUbloxTransmissionI2C();
-  }
-  
-  uint8_t ublox_i2c_read(uint8_t ack) {
-    TWCR = (1<<TWINT) | (1<<TWEN) | (ack? (1<<TWEA) : 0);
-    waitUbloxTransmissionI2C();
-    uint8_t r = TWDR;
-    if (!ack) i2c_stop();
-    return r;
-  }
-  #endif
-
- 
  #if defined(UBLOX) || defined(I2C_GPS_UBLOX) 
    const uint8_t PROGMEM UBLOX_INIT[] PROGMEM = {                          // PROGMEM array must be outside any function !!!
      0xB5,0x62,0x06,0x01,0x03,0x00,0xF0,0x05,0x00,0xFF,0x19,                            //disable all default NMEA messages
@@ -335,9 +296,9 @@ static int16_t nav_takeoff_bearing;
     #elif defined(I2C_GPS_UBLOX)
       TWBR = ((F_CPU / 100000L) - 16) / 2;       // change the I2C clock rate to 100Khz (UBLOX does not support any higher)
       
-      ublox_i2c_rep_start(I2C_GPS_UBLOX_ADDRESS<<1);
+      i2c_rep_start_slow(I2C_GPS_UBLOX_ADDRESS<<1);
       for(uint8_t i=0; i<sizeof(UBLOX_INIT); i++) {                        // send configuration data in UBX protocol 
-            ublox_i2c_write(pgm_read_byte(UBLOX_INIT+i));   
+            i2c_write_slow(pgm_read_byte(UBLOX_INIT+i));   
       } 
       i2c_stop();
       TWBR = ((F_CPU / I2C_SPEED) - 16) / 2;       // change the I2C clock rate back to default
@@ -525,31 +486,34 @@ void GPS_NewData(void) {
       if (GPS_newFrame(SerialRead(GPS_SERIAL))) {
     #elif defined(I2C_GPS_UBLOX)
     uint16_t c = 0;
+    uint8_t lenh, lenl;
     uint16_t buf[2];
     uint32_t ublox_timeout = millis() + 2; // 2ms timout
     
     TWBR = ((F_CPU / 100000L) - 16) / 2;       // change the I2C clock rate to 100Khz (UBLOX does not support any higher)
 
-    ublox_i2c_rep_start(I2C_GPS_UBLOX_ADDRESS<<1);
-    ublox_i2c_write(0xFD);
-    ublox_i2c_rep_start((I2C_GPS_UBLOX_ADDRESS<<1)|1);
-    buf[0] = ublox_i2c_read(1);
-    buf[1] = ublox_i2c_read(0);
+    if (!i2c_rep_start_slow(I2C_GPS_UBLOX_ADDRESS<<1)) return;
+    if (!i2c_write_slow(0xFD)) return;
+    if (!i2c_rep_start_slow((I2C_GPS_UBLOX_ADDRESS<<1)|1)) return;
+    if (!i2c_read_slow(1, &lenh)) return;
+    if (!i2c_read_slow(0, &lenl)) return;
     
-    c = ((uint16_t) buf[0] << 8) | buf[1];
+    c = ((uint16_t) lenh << 8) | lenl;
 
     bool new_frame = false;
-  
+    uint8_t data;
+    
     if (c) {
-      ublox_i2c_rep_start(I2C_GPS_UBLOX_ADDRESS<<1);
-      ublox_i2c_write(0xFF);         
-      ublox_i2c_rep_start((I2C_GPS_UBLOX_ADDRESS<<1)|1);
+      if (!i2c_rep_start_slow(I2C_GPS_UBLOX_ADDRESS<<1)) return;
+      if (!i2c_write_slow(0xFF)) return;
+      if (!i2c_rep_start_slow((I2C_GPS_UBLOX_ADDRESS<<1)|1)) return;
 
       while (c--) {
         if (ublox_timeout < millis()) c = 0;    // Only read until timout to prevent stall
 
         // Ack all but last byte 
-        if (GPS_newFrame(ublox_i2c_read(c))) new_frame = true;
+        if (!i2c_read_slow(c, &data)) return;
+        if (GPS_newFrame(data)) new_frame = true;
       }
     }
 
