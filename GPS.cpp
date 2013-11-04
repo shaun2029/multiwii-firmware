@@ -504,10 +504,11 @@ void GPS_NewData(void) {
     uint8_t data;
     
     if (c) {
+      if (c > 256) c = 256;  // read max 256 bytes (better reliability)    
+    
       if (!i2c_rep_start_slow(I2C_GPS_UBLOX_ADDRESS<<1)) return;
       if (!i2c_write_slow(0xFF)) return;
       if (!i2c_rep_start_slow((I2C_GPS_UBLOX_ADDRESS<<1)|1)) return;
-
       while (c--) {
         if (ublox_timeout < millis()) c = 0;    // Only read until timout to prevent stall
 
