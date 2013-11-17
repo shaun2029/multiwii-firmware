@@ -248,7 +248,24 @@ static int16_t nav_takeoff_bearing;
   }
   #endif
 
- #if defined(UBLOX) || defined(I2C_GPS_UBLOX) 
+  #if defined(I2C_GPS_UBLOX)
+  uint16_t UbloxI2CAvailable(void) {  
+    uint8_t lenh, lenl;
+    int8_t error = i2c_rep_start_slow(I2C_GPS_UBLOX_ADDRESS<<1);
+    if (!error) error = i2c_write_slow(0xFD);  
+    if (!error) error = i2c_rep_start_slow((I2C_GPS_UBLOX_ADDRESS<<1)|1);
+    if (!error) error = i2c_read_slow(1, &lenh);
+    if (!error) error = i2c_read_slow(0, &lenl);
+    if (!error) {
+      return ((uint16_t) lenh << 8) | lenl;
+    } else {
+      return 0;
+    }
+  }
+  #endif  
+
+    
+ #if defined(UBLOX) 
    const uint8_t PROGMEM UBLOX_INIT[] PROGMEM = {                          // PROGMEM array must be outside any function !!!
      0xB5,0x62,0x06,0x01,0x03,0x00,0xF0,0x05,0x00,0xFF,0x19,                            //disable all default NMEA messages
      0xB5,0x62,0x06,0x01,0x03,0x00,0xF0,0x03,0x00,0xFD,0x15,
@@ -263,8 +280,22 @@ static int16_t nav_takeoff_bearing;
      0xB5,0x62,0x06,0x16,0x08,0x00,0x03,0x07,0x03,0x00,0x51,0x08,0x00,0x00,0x8A,0x41,   //set WAAS to EGNOS
      0xB5, 0x62, 0x06, 0x08, 0x06, 0x00, 0xC8, 0x00, 0x01, 0x00, 0x01, 0x00, 0xDE, 0x6A //set rate to 5Hz
    };
+ #elif defined(I2C_GPS_UBLOX) 
+  const char PROGMEM UBLOX_INIT[] PROGMEM = {                          // PROGMEM array must be outside any function !!!
+     0xB5,0x62,0x06,0x00,0x14,0x00,0x00,0x00,0x00,0x00,0x84,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x00,0x01,0x00,0x00,0x00,0x00,0x00,0xA0,0x96, // DDC protocols UBX
+     0xB5,0x62,0x06,0x00,0x14,0x00,0x01,0x00,0x00,0x00,0xD0,0x00,0x00,0x00,0x80,0x25,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x90,0xF3, // UART1 OFF
+     0xB5,0x62,0x06,0x00,0x14,0x00,0x02,0x00,0x00,0x00,0xD0,0x00,0x00,0x00,0x80,0x25,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x91,0x07, // UART2 OFF     
+     0xB5,0x62,0x06,0x00,0x14,0x00,0x03,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x1D,0x84, // USB OFF     
+     0xB5,0x62,0x06,0x00,0x14,0x00,0x04,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x1E,0x98,  // SPI OFF     
+     0xB5,0x62,0x06,0x01,0x03,0x00,0x01,0x02,0x01,0x0E,0x47,                            //set POSLLH MSG rate
+     0xB5,0x62,0x06,0x01,0x03,0x00,0x01,0x03,0x00,0x0E,0x48,                            //set STATUS MSG rate
+     0xB5,0x62,0x06,0x01,0x03,0x00,0x01,0x06,0x01,0x12,0x4F,                            //set SOL MSG rate
+     0xB5,0x62,0x06,0x01,0x03,0x00,0x01,0x12,0x01,0x1E,0x67,                            //set VELNED MSG rate
+     0xB5,0x62,0x06,0x16,0x08,0x00,0x03,0x07,0x03,0x00,0x51,0x08,0x00,0x00,0x8A,0x41,   //set WAAS to EGNOS
+     0xB5, 0x62, 0x06, 0x08, 0x06, 0x00, 0xC8, 0x00, 0x01, 0x00, 0x01, 0x00, 0xDE, 0x6A //set rate to 5Hz
+  };
  #endif
-
+ 
   void GPS_SerialInit(void) {
     #if defined(GPS_SERIAL)
     SerialOpen(GPS_SERIAL,GPS_BAUD);
@@ -485,42 +516,31 @@ void GPS_NewData(void) {
     //while (SerialAvailable(GPS_SERIAL)) {
       if (GPS_newFrame(SerialRead(GPS_SERIAL))) {
     #elif defined(I2C_GPS_UBLOX)
-    uint16_t c = 0;
-    uint8_t lenh, lenl;
-    uint16_t buf[2];
-    uint32_t ublox_timeout = millis() + 2; // 2ms timout
-    
-    TWBR = ((F_CPU / 100000L) - 16) / 2;       // change the I2C clock rate to 100Khz (UBLOX does not support any higher)
 
-    if (!i2c_rep_start_slow(I2C_GPS_UBLOX_ADDRESS<<1)) return;
-    if (!i2c_write_slow(0xFD)) return;
-    if (!i2c_rep_start_slow((I2C_GPS_UBLOX_ADDRESS<<1)|1)) return;
-    if (!i2c_read_slow(1, &lenh)) return;
-    if (!i2c_read_slow(0, &lenl)) return;
-    
-    c = ((uint16_t) lenh << 8) | lenl;
+    uint32_t ublox_timeout = micros() + 5000; // us timout to prevent stalling.
+    TWBR = ((F_CPU / 100000L) - 16) / 2; // Change the I2C clock rate to 100Khz (U-blox does not support any higher).
+    uint16_t c = UbloxI2CAvailable();  // Get message stream length.
 
+    // Read the message data stream using register address 0xFF.
     bool new_frame = false;
     uint8_t data;
-    
     if (c) {
-      if (c > 256) c = 256;  // read max 256 bytes (better reliability)    
-    
-      if (!i2c_rep_start_slow(I2C_GPS_UBLOX_ADDRESS<<1)) return;
-      if (!i2c_write_slow(0xFF)) return;
-      if (!i2c_rep_start_slow((I2C_GPS_UBLOX_ADDRESS<<1)|1)) return;
+      uint8_t error = i2c_rep_start_slow((I2C_GPS_UBLOX_ADDRESS<<1)|1); 
+      if (error) c = 0;
+      if (c > 256) c = 256;  // Read max 256 bytes (better reliability)    
       while (c--) {
-        if (ublox_timeout < millis()) c = 0;    // Only read until timout to prevent stall
-
-        // Ack all but last byte 
-        if (!i2c_read_slow(c, &data)) return;
-        if (GPS_newFrame(data)) new_frame = true;
+        if (ublox_timeout < micros()) c = 0; // Only read until timout to prevent stall.
+        if (i2c_read_slow(c, &data)) break; // Ack all but last byte
+        if (GPS_newFrame(data)) // Parse data looking for new GPS data.
+        {
+          new_frame = true; 
+          if (c > 1) c = 1; // stop reading data. 
+        }
       }
     }
 
     TWBR = ((F_CPU / I2C_SPEED) - 16) / 2;       // change the I2C clock rate back to default
-
-   if (new_frame) {    
+    if (new_frame) {
     #elif defined(GPS_FROM_OSD)
     {
       if(GPS_update & 2) {  // Once second bit of GPS_update is set, indicate new GPS datas is readed from OSD - all in right format.

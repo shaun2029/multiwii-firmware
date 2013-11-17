@@ -296,46 +296,49 @@ uint8_t i2c_readReg(uint8_t add, uint8_t reg) {
 
 // I2C slow functions have a much longer timout. This is to support
 // the U-blox NEO-M6 GPS over I2C. It can be slow to respond.
-bool waitTransmissionI2C_slow(void) {
+// Return 0 on success
+int8_t waitTransmissionI2C_slow(void) {
   uint16_t count = 16000;
   while (!(TWCR & (1<<TWINT))) {
     count--;
     if (count==0) {              //we are in a blocking state => we don't insist
       TWCR = 0;                  //and we force a reset on TWINT register
-      neutralizeTime = micros(); //we take a timestamp here to neutralize the value during a short delay
       i2c_errors_count++;
-      return false;
+      return 1;
     }
   }
-  return true;
+  return 0;
 }
 
-bool i2c_rep_start_slow(uint8_t address) {
+// Return 0 on success
+int8_t i2c_rep_start_slow(uint8_t address) {
   TWCR = (1<<TWINT) | (1<<TWSTA) | (1<<TWEN) ; // send REPEAT START condition
-  if (waitTransmissionI2C_slow())                // wait until transmission completed
+  if (!waitTransmissionI2C_slow())              // wait until transmission completed
   {
     TWDR = address;                            // send device address
     TWCR = (1<<TWINT) | (1<<TWEN);
     return waitTransmissionI2C_slow();         // wail until transmission completed
   }
-  return false;
+  return 1;
 }
 
-bool i2c_write_slow(uint8_t data) {
+// Return 0 on success
+int8_t i2c_write_slow(uint8_t data) {
   TWDR = data;                                 // send data to the previously addressed device
   TWCR = (1<<TWINT) | (1<<TWEN);
   return waitTransmissionI2C_slow();
 }
 
-bool i2c_read_slow(uint8_t ack, uint8_t *data) {
+// Return 0 on success
+int8_t i2c_read_slow(uint8_t ack, uint8_t *data) {
   TWCR = (1<<TWINT) | (1<<TWEN) | (ack? (1<<TWEA) : 0);
-  if (waitTransmissionI2C_slow())
+  if (!waitTransmissionI2C_slow())
   {
     *data = TWDR;
     if (!ack) i2c_stop();
-    return true;
+    return 0;
   } 
-  return false;
+  return 1;
 }
 
 // ****************
