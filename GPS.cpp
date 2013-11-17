@@ -332,7 +332,7 @@ static int16_t nav_takeoff_bearing;
             i2c_write_slow(pgm_read_byte(UBLOX_INIT+i));   
       } 
       i2c_stop();
-      TWBR = ((F_CPU / I2C_SPEED) - 16) / 2;       // change the I2C clock rate back to default
+      TWBR = ((F_CPU / 400000L) - 16) / 2;       // change the I2C clock rate back to 400KHz
     #elif defined(INIT_MTK_GPS)                              // MTK GPS setup
       for(uint8_t i=0;i<5;i++){
         SerialOpen(GPS_SERIAL,init_speed[i]);                // switch UART speed for sending SET BAUDRATE command
@@ -539,7 +539,7 @@ void GPS_NewData(void) {
       }
     }
 
-    TWBR = ((F_CPU / I2C_SPEED) - 16) / 2;       // change the I2C clock rate back to default
+    TWBR = ((F_CPU / 400000L) - 16) / 2;       // change the I2C clock rate back to 400KHz
     if (new_frame) {
     #elif defined(GPS_FROM_OSD)
     {
