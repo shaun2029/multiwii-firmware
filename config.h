@@ -200,7 +200,7 @@
       /* enforce your individual sensor orientation - even overrides board specific defaults */
       #define FORCE_ACC_ORIENTATION(X, Y, Z)  {imu.accADC[ROLL]  =  X; imu.accADC[PITCH]  =  Y; imu.accADC[YAW]  =  Z;}
       #define FORCE_GYRO_ORIENTATION(X, Y, Z) {imu.gyroADC[ROLL] = -Y; imu.gyroADC[PITCH] =  X; imu.gyroADC[YAW] = -Z;}
-      #define FORCE_MAG_ORIENTATION(X, Y, Z)  {imu.magADC[ROLL]  =  X; imu.magADC[PITCH]  =  Y; imu.magADC[YAW]  = -Z;} 
+      #define FORCE_MAG_ORIENTATION(X, Y, Z)  {imu.magADC[ROLL]  =  -X; imu.magADC[PITCH]  =  -Y; imu.magADC[YAW]  = -Z;}
 
       /* Board orientation shift */
       /* If you have frame designed only for + mode and you cannot rotate FC phisycally for flying in X mode (or vice versa)
@@ -690,7 +690,6 @@
        Note the sign on declination it could be negative or positive (WEST or EAST) */
     //#define MAG_DECLINATION  3.96f              //For Budapest Hungary.
     #define MAG_DECLINATION  -0.56f               // Gillingham, Kent, England
-    #define MAG_OFFSET 180                        // Compensate for board layout
 
     #define GPS_LEAD_FILTER                      // Adds a forward predictive filterig to compensate gps lag. Code based on Jason Short's lead filter implementation
     
