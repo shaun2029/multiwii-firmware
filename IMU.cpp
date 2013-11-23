@@ -236,6 +236,7 @@ void getEstimatedAttitude(){
       EstM32.V.Z * EstG32.V.X - EstM32.V.X * EstG32.V.Z,
       (EstM.V.Y * sqGX_sqGZ  - (EstM32.V.X * EstG32.V.X + EstM32.V.Z * EstG32.V.Z) * EstG.V.Y)*invG ); 
     att.heading += conf.mag_declination; // Set from GUI
+    if (att.heading < 0) att.heading += 3600; // correct negative values
     att.heading /= 10;
   #endif
 

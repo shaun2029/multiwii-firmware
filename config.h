@@ -198,9 +198,9 @@
       //#define ADCACC
 
       /* enforce your individual sensor orientation - even overrides board specific defaults */
-      #define FORCE_ACC_ORIENTATION(X, Y, Z)  {imu.accADC[ROLL]  =  X; imu.accADC[PITCH]  =  Y; imu.accADC[YAW]  =  Z;}
-      #define FORCE_GYRO_ORIENTATION(X, Y, Z) {imu.gyroADC[ROLL] = -Y; imu.gyroADC[PITCH] =  X; imu.gyroADC[YAW] = -Z;}
-      #define FORCE_MAG_ORIENTATION(X, Y, Z)  {imu.magADC[ROLL]  =  -X; imu.magADC[PITCH]  =  -Y; imu.magADC[YAW]  = -Z;}
+      //#define FORCE_ACC_ORIENTATION(X, Y, Z)  {imu.accADC[ROLL]  =  X; imu.accADC[PITCH]  =  Y; imu.accADC[YAW]  =  Z;}
+      //#define FORCE_GYRO_ORIENTATION(X, Y, Z) {imu.gyroADC[ROLL] = -Y; imu.gyroADC[PITCH] =  X; imu.gyroADC[YAW] = -Z;}
+      //#define FORCE_MAG_ORIENTATION(X, Y, Z)  {imu.magADC[ROLL]  =  -X; imu.magADC[PITCH]  =  -Y; imu.magADC[YAW]  = -Z;}
 
       /* Board orientation shift */
       /* If you have frame designed only for + mode and you cannot rotate FC phisycally for flying in X mode (or vice versa)
@@ -811,7 +811,7 @@
        vbat = [0;1023]*16/VBATSCALE
        must be associated with #define BUZZER ! */
     #define VBAT              // uncomment this line to activate the vbat code
-    #define VBATSCALE       77 //131 (*) change this value if readed Battery voltage is different than real voltage
+    #define VBATSCALE       75 //131 (*) change this value if readed Battery voltage is different than real voltage
     #define VBATNOMINAL     84 // 8.4V full battery nominal voltage - only used for lcd.telemetry
     #define VBATLEVEL_WARN1  65 // (*) 6.5V
     #define VBATLEVEL_WARN2  64 // (*) 6.4V
