@@ -680,7 +680,7 @@ void GPS_reset_nav(void) {
 
 //Get the relevant P I D values and set the PID controllers 
 void GPS_set_pids(void) {
-  #if defined(GPS_SERIAL)  || defined(GPS_FROM_OSD)
+  #if defined(GPS_SERIAL)  || defined(GPS_FROM_OSD) || defined(I2C_GPS_UBLOX)
     posholdPID_PARAM.kP   = (float)conf.pid[PIDPOS].P8/100.0;
     posholdPID_PARAM.kI   = (float)conf.pid[PIDPOS].I8/100.0;
     posholdPID_PARAM.Imax = POSHOLD_RATE_IMAX * 100;
