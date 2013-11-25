@@ -663,7 +663,7 @@
     //#define I2C_GPS_SONAR
 
     // Communicate with UBLOX GPS via I2C
-    #define I2C_GPS_UBLOX //Don't define UBLOX
+    //#define I2C_GPS_UBLOX //Don't define UBLOX
 
     /* GPS data readed from Misio-OSD - GPS module connected to OSD, and MultiWii read GPS data from OSD - tested and working OK ! */
     //#define GPS_FROM_OSD
@@ -672,7 +672,7 @@
       - No GPS FIX -> LED blink at speed of incoming GPS frames
       - Fix and sat no. bellow 5 -> LED off
       - Fix and sat no. >= 5 -> LED blinks, one blink for 5 sat, two blinks for 6 sat, three for 7 ... */
-    #define GPS_LED_INDICATOR
+    //#define GPS_LED_INDICATOR
 
     //#define USE_MSP_WP                        //Enables the MSP_WP command, which is used by WinGUI to display and log Home and Poshold positions
 
