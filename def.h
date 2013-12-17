@@ -256,8 +256,8 @@
   #if !defined(MONGOOSE1_0)
     #define LEDPIN_PINMODE             pinMode (13, OUTPUT);
     #define LEDPIN_TOGGLE              PINB |= 1<<5;     //switch LEDPIN state (digital PIN 13)
-    #define LEDPIN_OFF                 PORTB &= ~(1<<5);
-    #define LEDPIN_ON                  PORTB |= (1<<5);
+    #define LEDPIN_OFF                 PORTB &= ~(1<<5); PORTC |= 1<<0;  //Also use A0 for indication
+    #define LEDPIN_ON                  PORTB |= (1<<5); PORTC &= ~(1<<0);  //Also use A0 for indication
   #endif
   #if !defined(RCAUXPIN8) 
     #if !defined(MONGOOSE1_0)
@@ -298,8 +298,8 @@
     #define LCDPIN_OFF                 PORTD &= ~1; //switch OFF digital PIN 0
     #define LCDPIN_ON                  PORTD |= 1;
     #define STABLEPIN_PINMODE          pinMode(A0,OUTPUT);
-    #define STABLEPIN_ON               PORTC &= ~(1<<0);  //GPS LED Indicator ON PIN A0
-    #define STABLEPIN_OFF              PORTC |= 1<<0;     //GPS LED Indicator OFF PIN A0
+    #define STABLEPIN_ON               ;//PORTC |= 1<<0;  //GPS LED Indicator ON PIN A0
+    #define STABLEPIN_OFF              ;//PORTC &= ~(1<<0);     //GPS LED Indicator OFF PIN A0
   #endif 
   #define PPM_PIN_INTERRUPT          attachInterrupt(0, rxInt, RISING); //PIN 0
   #define SPEK_SERIAL_PORT           0
