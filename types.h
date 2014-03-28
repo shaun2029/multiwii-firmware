@@ -177,6 +177,7 @@ typedef struct {
     uint8_t vbatlevel_warn1;
     uint8_t vbatlevel_warn2;
     uint8_t vbatlevel_crit;
+    uint8_t vbatlevel_cell_max;
   #endif
   #ifdef POWERMETER
     uint8_t pint2ma;

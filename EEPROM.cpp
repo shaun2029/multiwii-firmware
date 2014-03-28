@@ -105,6 +105,7 @@ void update_constants() {
     conf.vbatlevel_warn1 = VBATLEVEL_WARN1;
     conf.vbatlevel_warn2 = VBATLEVEL_WARN2;
     conf.vbatlevel_crit = VBATLEVEL_CRIT;
+    conf.vbatlevel_cell_max = VBATCELLMAX;
   #endif
   #ifdef POWERMETER
     conf.pint2ma = PINT2mA;
