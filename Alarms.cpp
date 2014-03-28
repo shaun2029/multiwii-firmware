@@ -101,11 +101,20 @@ void alarmHandler(void){
   #endif
   
   #if defined(VBAT)
-    if (vbatMin < conf.vbatlevel_crit) alarmArray[6] = 4;
-    else if ( (analog.vbat > conf.vbatlevel_warn1)  || (NO_VBAT > analog.vbat)) alarmArray[6] = 0;
-    else if (analog.vbat > conf.vbatlevel_warn2) alarmArray[6] = 1;
-    else if (analog.vbat > conf.vbatlevel_crit) alarmArray[6] = 2;
-    //else alarmArray[6] = 4;
+    uint8_t vbatMinCell, vbatCell, vbatCellCount;
+    
+    // Work out how many cells are connected in series.
+    vbatCellCount = (vbatMin / conf.vbatlevel_cell_max) + 1;
+    
+    // Calculate cell voltage.
+    vbatMinCell = vbatMin / vbatCellCount;
+    vbatCell = analog.vbat / vbatCellCount;
+    
+    if (vbatMinCell < conf.vbatlevel_crit) alarmArray[6] = 4;
+    else if ( (vbatCell > conf.vbatlevel_warn1)  || (NO_VBAT > analog.vbat)) alarmArray[6] = 0;
+    else if (vbatCell > conf.vbatlevel_warn2) alarmArray[6] = 1;
+    else if (vbatCell > conf.vbatlevel_crit) alarmArray[6] = 2;
+    else alarmArray[6] = 4;
   #endif
   
   if (i2c_errors_count > i2c_errors_count_old+100 || i2c_errors_count < -1) alarmArray[9] = 1;

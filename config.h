@@ -64,7 +64,7 @@
 
   /****************************    Motor maxthrottle    *******************************/
     /* this is the maximum value for the ESCs at full power, this value can be increased up to 2000 */
-    #define MAXTHROTTLE 1850
+    #define MAXTHROTTLE 1850 //1850 default for multicopters
 
   /****************************    Mincommand          *******************************/
     /* this is the value for the ESCs when they are not armed
@@ -811,12 +811,15 @@
        with R1=33k and R2=51k
        vbat = [0;1023]*16/VBATSCALE
        must be associated with #define BUZZER ! */
+    // Works on a per cell basis
+    // Voltage > 8.8 3S else 2S   
     #define VBAT              // uncomment this line to activate the vbat code
-    #define VBATSCALE       77 //131 (*) change this value if readed Battery voltage is different than real voltage
-    #define VBATNOMINAL     84 // 8.4V full battery nominal voltage - only used for lcd.telemetry
-    #define VBATLEVEL_WARN1  66 // (*) 10,7V
-    #define VBATLEVEL_WARN2  64 // (*) 6.6V
-    #define VBATLEVEL_CRIT   62 // (*) 6.2V - critical condition: if vbat ever goes below this value, permanent alarm is triggered
+    #define VBATSCALE        75 //131 (*) change this value if readed Battery voltage is different than real voltage
+    #define VBATCELLMAX      44 // 4.4V Max voltage per cell  
+    #define VBATNOMINAL      42 // 4.2V full battery nominal voltage per cell - only used for lcd.telemetry
+    #define VBATLEVEL_WARN1  33 // (*) 3.3V per cell
+    #define VBATLEVEL_WARN2  32 // (*) 3.2V per cell
+    #define VBATLEVEL_CRIT   31 // (*) 3.1V - critical cell condition: if vbat ever goes below this value, permanent alarm is triggered
     #define NO_VBAT          38  // (*) Avoid beeping without any battery 
 
   /********************************************************************/
