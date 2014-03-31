@@ -571,7 +571,7 @@
     #define FAILSAFE                                // uncomment  to activate the failsafe function
     #define FAILSAFE_DELAY     10                     // Guard time for failsafe activation after signal lost. 1 step = 0.1sec - 1sec in example
     #define FAILSAFE_OFF_DELAY 200                    // Time for Landing before motors stop in 0.1sec. 1 step = 0.1sec - 20sec in example
-    #define FAILSAFE_THROTTLE  (MINTHROTTLE + 200)    // (*) Throttle level used for landing - may be relative to MINTHROTTLE - as in this case
+    #define FAILSAFE_THROTTLE  (MINTHROTTLE + 100)    // (*) Throttle level used for landing - may be relative to MINTHROTTLE - as in this case
     
     #define FAILSAFE_DETECT_TRESHOLD  985
 
@@ -816,8 +816,8 @@
     #define VBATSCALE        75 //131 (*) change this value if readed Battery voltage is different than real voltage
     #define VBATCELLMAX      44 // 4.4V Max voltage per cell  
     #define VBATNOMINAL      42 // 4.2V full battery nominal voltage per cell - only used for lcd.telemetry
-    #define VBATLEVEL_WARN1  33 // (*) 3.3V per cell
-    #define VBATLEVEL_WARN2  32 // (*) 3.2V per cell
+    #define VBATLEVEL_WARN1  34 // (*) 3.3V per cell
+    #define VBATLEVEL_WARN2  33 // (*) 3.2V per cell
     #define VBATLEVEL_CRIT   31 // (*) 3.1V - critical cell condition: if vbat ever goes below this value, permanent alarm is triggered
     #define NO_VBAT          38  // (*) Avoid beeping without any battery 
 
