@@ -1280,9 +1280,9 @@ void loop () {
   #define GYRO_P_MAX 300
   #define GYRO_I_MAX 250
 
-  // If flying in Horizontal mode disable rate.
+  // If flying in Horizontal mode use half yawRate rate.
   if (f.HORIZON_MODE) {
-    rc = mul(rcCommand[YAW] , 30)  >> 5;
+    rc = mul(rcCommand[YAW] , (conf.yawRate + 30))  >> 5;
   } else {
     rc = mul(rcCommand[YAW] , (2*conf.yawRate + 30))  >> 5;
   }
