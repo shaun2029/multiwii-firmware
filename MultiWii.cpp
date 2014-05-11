@@ -357,7 +357,14 @@ void annexCode() { // this code is excetuted at each loop and won't interfere wi
     if(axis!=2) { //ROLL & PITCH
       tmp2 = tmp>>7; // 500/128 = 3.9  => range [0;3]
       rcCommand[axis] = lookupPitchRollRC[tmp2] + ((tmp-(tmp2<<7)) * (lookupPitchRollRC[tmp2+1]-lookupPitchRollRC[tmp2])>>7);
-      prop1 = 128-((uint16_t)conf.rollPitchRate*tmp>>9); // prop1 was 100, is 128 now -- and /512 instead of /500
+      
+      // If flying in Horizontal mode use half rate value
+      if (f.HORIZON_MODE) {
+        prop1 = 128-((uint16_t)((conf.rollPitchRate>>2)*tmp>>9)); // prop1 was 100, is 128 now -- and /512 instead of /500
+      } else {
+        prop1 = 128-((uint16_t)conf.rollPitchRate*tmp>>9); // prop1 was 100, is 128 now -- and /512 instead of /500
+      }
+      
       prop1 = (uint16_t)prop1*prop2>>7; // prop1: max is 128   prop2: max is 128   result prop1: max is 128
       dynP8[axis] = (uint16_t)conf.pid[axis].P8*prop1>>7; // was /100, is /128 now
       dynD8[axis] = (uint16_t)conf.pid[axis].D8*prop1>>7; // was /100, is /128 now
@@ -1273,7 +1280,12 @@ void loop () {
   #define GYRO_P_MAX 300
   #define GYRO_I_MAX 250
 
-  rc = mul(rcCommand[YAW] , (2*conf.yawRate + 30))  >> 5;
+  // If flying in Horizontal mode use half rate value
+  if (f.HORIZON_MODE) {
+    rc = mul(rcCommand[YAW] , (conf.yawRate + 30))  >> 5;
+  } else {
+    rc = mul(rcCommand[YAW] , (2*conf.yawRate + 30))  >> 5;
+  }
 
   error = rc - imu.gyroData[YAW];
   errorGyroI_YAW  += mul(error,conf.pid[YAW].I8);
@@ -1294,7 +1306,7 @@ void loop () {
   #define GYRO_I_MAX 256
   #define ACC_I_MAX 256
   prop = min(max(abs(rcCommand[PITCH]),abs(rcCommand[ROLL])),500); // range [0;500]
-
+  
   //----------PID controller----------
   for(axis=0;axis<3;axis++) {
     //-----Get the desired angle rate depending on flight mode
