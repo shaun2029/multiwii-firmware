@@ -141,10 +141,10 @@ void LoadDefaults() {
     // #include MY_PRIVATE_DEFAULTS
     // do that at the last possible moment, so we can override virtually all defaults and constants
   #else
-	  #if PID_CONTROLLER == 1
-      conf.pid[ROLL].P8     = 33;  conf.pid[ROLL].I8    = 30; conf.pid[ROLL].D8     = 23;
-      conf.pid[PITCH].P8    = 33; conf.pid[PITCH].I8    = 30; conf.pid[PITCH].D8    = 23;
-      conf.pid[PIDLEVEL].P8 = 90; conf.pid[PIDLEVEL].I8 = 10; conf.pid[PIDLEVEL].D8 = 100;
+    #if PID_CONTROLLER == 1
+      conf.pid[ROLL].P8     = 27;  conf.pid[ROLL].I8    = 30; conf.pid[ROLL].D8     = 23;
+      conf.pid[PITCH].P8    = 27; conf.pid[PITCH].I8    = 30; conf.pid[PITCH].D8    = 23;
+      conf.pid[PIDLEVEL].P8 = 80; conf.pid[PIDLEVEL].I8 = 10; conf.pid[PIDLEVEL].D8 = 100;
     #elif PID_CONTROLLER == 2
       conf.pid[ROLL].P8     = 28;  conf.pid[ROLL].I8    = 10; conf.pid[ROLL].D8     = 7;
       conf.pid[PITCH].P8    = 28; conf.pid[PITCH].I8    = 10; conf.pid[PITCH].D8    = 7;
@@ -162,8 +162,8 @@ void LoadDefaults() {
     conf.pid[PIDVEL].P8 = 0;      conf.pid[PIDVEL].I8 = 0;    conf.pid[PIDVEL].D8 = 0;
 
     conf.rcRate8 = 90; conf.rcExpo8 = 65;
-    conf.rollPitchRate = 0;
-    conf.yawRate = 0;
+    conf.rollPitchRate = 3.6;
+    conf.yawRate = 3.6;
     conf.dynThrPID = 0;
     conf.thrMid8 = 50; conf.thrExpo8 = 0;
     for(i=0;i<CHECKBOXITEMS;i++) {conf.activate[i] = 0;}
