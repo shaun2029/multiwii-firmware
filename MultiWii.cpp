@@ -358,9 +358,9 @@ void annexCode() { // this code is excetuted at each loop and won't interfere wi
       tmp2 = tmp>>7; // 500/128 = 3.9  => range [0;3]
       rcCommand[axis] = lookupPitchRollRC[tmp2] + ((tmp-(tmp2<<7)) * (lookupPitchRollRC[tmp2+1]-lookupPitchRollRC[tmp2])>>7);
       
-      // If flying in Horizontal mode use half rate value
+      // If flying in Horizontal mode disable rate.
       if (f.HORIZON_MODE) {
-        prop1 = 128-((uint16_t)((conf.rollPitchRate>>2)*tmp>>9)); // prop1 was 100, is 128 now -- and /512 instead of /500
+        prop1 = 128;
       } else {
         prop1 = 128-((uint16_t)conf.rollPitchRate*tmp>>9); // prop1 was 100, is 128 now -- and /512 instead of /500
       }
@@ -1280,9 +1280,9 @@ void loop () {
   #define GYRO_P_MAX 300
   #define GYRO_I_MAX 250
 
-  // If flying in Horizontal mode use half rate value
+  // If flying in Horizontal mode disable rate.
   if (f.HORIZON_MODE) {
-    rc = mul(rcCommand[YAW] , (conf.yawRate + 30))  >> 5;
+    rc = mul(rcCommand[YAW] , 30)  >> 5;
   } else {
     rc = mul(rcCommand[YAW] , (2*conf.yawRate + 30))  >> 5;
   }
