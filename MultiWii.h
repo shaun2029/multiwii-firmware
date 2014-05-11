@@ -24,6 +24,10 @@
 #define MINCHECK 1100
 #define MAXCHECK 1900
 
+//Arm, disarm with 50% YAW D/R for 5X - ShaunS
+#define MINCHECKHALF 1275
+#define MAXCHECKHALF 1725
+
 extern volatile unsigned long timer0_overflow_count;
 
 extern const char pidnames[];

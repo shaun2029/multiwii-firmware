@@ -839,8 +839,22 @@ void loop () {
     uint8_t stTmp = 0;
     for(i=0;i<4;i++) {
       stTmp >>= 2;
-      if(rcData[i] > MINCHECK) stTmp |= 0x80;      // check for MIN
-      if(rcData[i] < MAXCHECK) stTmp |= 0x40;      // check for MAX
+      
+
+      //Arm, disarm with 50% YAW D/R for 5X - ShaunS
+      if (i==2) {     
+        stTmp |= 0x80;      // Assume not at MIN
+        stTmp |= 0x40;      // Assume not at MAX
+
+        if(rcData[i] < MINCHECK) stTmp &= 0x7F;      // check for MIN
+        if((rcData[i] < MINCHECKHALF) && (rcData[i] > MINCHECKHALF - 50)) stTmp &= 0x7F;      // check for D/R 50% MIN
+        
+        if(rcData[i] > MAXCHECK) stTmp &= 0xBF;      // check for MAX
+        if((rcData[i] > MAXCHECKHALF) && (rcData[i] < MAXCHECKHALF + 50)) stTmp &= 0xBF;      // check for D/R 50% MIN
+      } else {
+        if(rcData[i] > MINCHECK) stTmp |= 0x80;      // check for MIN
+        if(rcData[i] < MAXCHECK) stTmp |= 0x40;      // check for MAX
+      }
     }
     if(stTmp == rcSticks) {
       if(rcDelayCommand<250) rcDelayCommand++;
