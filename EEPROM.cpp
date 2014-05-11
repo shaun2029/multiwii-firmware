@@ -162,8 +162,8 @@ void LoadDefaults() {
     conf.pid[PIDVEL].P8 = 0;      conf.pid[PIDVEL].I8 = 0;    conf.pid[PIDVEL].D8 = 0;
 
     conf.rcRate8 = 90; conf.rcExpo8 = 65;
-    conf.rollPitchRate = 3.6;
-    conf.yawRate = 3.6;
+    conf.rollPitchRate = 36;
+    conf.yawRate = 36;
     conf.dynThrPID = 0;
     conf.thrMid8 = 50; conf.thrExpo8 = 0;
     for(i=0;i<CHECKBOXITEMS;i++) {conf.activate[i] = 0;}
