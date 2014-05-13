@@ -743,7 +743,7 @@ void go_arm() {
         writePLog();
       #endif
       // Beep when arming - ShaunS
-      alarmArray[8] = 1;
+      alarmArray[7] = 1;
     }
   } else if(!f.ARMED) { 
     blinkLED(2,255,1);
