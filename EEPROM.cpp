@@ -142,8 +142,8 @@ void LoadDefaults() {
     // do that at the last possible moment, so we can override virtually all defaults and constants
   #else
     #if PID_CONTROLLER == 1
-      conf.pid[ROLL].P8     = 31;  conf.pid[ROLL].I8    = 31; conf.pid[ROLL].D8     = 21;
-      conf.pid[PITCH].P8    = 31; conf.pid[PITCH].I8    = 31; conf.pid[PITCH].D8    = 21;
+      conf.pid[ROLL].P8     = 50;  conf.pid[ROLL].I8    = 31; conf.pid[ROLL].D8     = 30;
+      conf.pid[PITCH].P8    = 50; conf.pid[PITCH].I8    = 31; conf.pid[PITCH].D8    = 30;
       conf.pid[PIDLEVEL].P8 = 90; conf.pid[PIDLEVEL].I8 = 10; conf.pid[PIDLEVEL].D8 = 100;
     #elif PID_CONTROLLER == 2
       conf.pid[ROLL].P8     = 28;  conf.pid[ROLL].I8    = 10; conf.pid[ROLL].D8     = 7;
