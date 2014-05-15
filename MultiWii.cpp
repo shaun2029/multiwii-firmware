@@ -268,7 +268,10 @@ int16_t rcSerial[8];         // interval [1000;2000] - is rcData coming from MSP
 int16_t rcCommand[4];        // interval [1000;2000] for THROTTLE and [-500;+500] for ROLL/PITCH/YAW
 uint8_t rcSerialCount = 0;   // a counter to select legacy RX when there is no more MSP rc serial data
 int16_t lookupPitchRollRC[5];// lookup table for expo & RC rate PITCH+ROLL
+int16_t lookupPitchRollRC_DR[5];// lookup table for expo & RC rate PITCH+ROLL with D/R 50% on when arming (5X beginner mode)
 int16_t lookupThrottleRC[11];// lookup table for expo & mid THROTTLE
+int8_t drModeActive = 0; // Record if the copter armed with D/R 50% active.
+uint8_t drMode = 0;
 
 #if defined(SPEKTRUM) || defined(SBUS)
   volatile uint8_t  spekFrameFlags;
@@ -357,7 +360,13 @@ void annexCode() { // this code is excetuted at each loop and won't interfere wi
     #endif
     if(axis!=2) { //ROLL & PITCH
       tmp2 = tmp>>7; // 500/128 = 3.9  => range [0;3]
-      rcCommand[axis] = lookupPitchRollRC[tmp2] + ((tmp-(tmp2<<7)) * (lookupPitchRollRC[tmp2+1]-lookupPitchRollRC[tmp2])>>7);
+      
+      if (!drModeActive) {
+        rcCommand[axis] = lookupPitchRollRC[tmp2] + ((tmp-(tmp2<<7)) * (lookupPitchRollRC[tmp2+1]-lookupPitchRollRC[tmp2])>>7);
+      } else {
+        // If D/R 50% active use lower expo for better responsiveness. 
+        rcCommand[axis] = lookupPitchRollRC_DR[tmp2] + ((tmp-(tmp2<<7)) * (lookupPitchRollRC_DR[tmp2+1]-lookupPitchRollRC_DR[tmp2])>>7);
+      }
       
       // If flying in Angle mode disable rate.
       if (f.ANGLE_MODE) {
@@ -752,6 +761,9 @@ void go_arm() {
     blinkLED(2,255,1);
     alarmArray[8] = 1;
   }
+  
+  // Did the copter arm with D/R 50% active?
+  drModeActive = drMode; 
 }
 void go_disarm() {
   if (f.ARMED) {
@@ -854,8 +866,15 @@ void loop () {
         stTmp |= 0x80;      // Assume not at MIN
         stTmp |= 0x40;      // Assume not at MAX
 
-        if(rcData[i] < MINCHECK) stTmp &= 0x7F;      // check for MIN
-        if((rcData[i] < MINCHECKHALF) && (rcData[i] > MINCHECKHALF - 50)) stTmp &= 0x7F;      // check for D/R 50% MIN
+        if(rcData[i] < MINCHECK) {
+          stTmp &= 0x7F;      // check for MIN
+          drMode = 0;
+        }
+        
+        if((rcData[i] < MINCHECKHALF) && (rcData[i] > MINCHECKHALF - 50)) {
+          stTmp &= 0x7F;      // check for D/R 50% MIN
+          drMode = 1;
+        }
         
         if(rcData[i] > MAXCHECK) stTmp &= 0xBF;      // check for MAX
         if((rcData[i] > MAXCHECKHALF) && (rcData[i] < MAXCHECKHALF + 50)) stTmp &= 0xBF;      // check for D/R 50% MIN

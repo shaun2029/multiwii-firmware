@@ -43,6 +43,7 @@ bool readEEPROM() {
   // 500/128 = 3.90625    3.9062 * 3.9062 = 15.259   1526*100/128 = 1192
   for(i=0;i<5;i++) {
     lookupPitchRollRC[i] = (1526+conf.rcExpo8*(i*i-15))*i*(int32_t)conf.rcRate8/1192;
+    lookupPitchRollRC_DR[i] = (1526+(conf.rcExpo8>>1)*(i*i-15))*i*(int32_t)conf.rcRate8/1192;
   }
   for(i=0;i<11;i++) {
     int16_t tmp = 10*i-conf.thrMid8;
