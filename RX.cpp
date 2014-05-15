@@ -404,6 +404,14 @@ uint16_t readRawRC(uint8_t chan) {
     data = rcValue[rcChannel[chan]]; // Let's copy the data Atomically
     SREG = oldSREG;        // Let's restore interrupt state
   #endif
+
+  // Scale RC input
+  #ifdef SCALE_RC
+    uint32_t rcData = data * (uint32_t)(SCALE_RC_GAIN_NUM);
+    data = uint16_t(rcData >> 10); // Divide by 1024;
+    data += SCALE_RC_OFFSET;
+  #endif  
+         
   return data; // We return the value correctly copied when the IRQ's where disabled
 }
 

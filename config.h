@@ -367,6 +367,47 @@
       //#define RX_SERIAL_PORT 1
       #define SBUS_MID_OFFSET 988 //SBUS Mid-Point at 1500
 
+    /**************************************************************************************/
+    /***************                  RC scaling                       ********************/
+    /**************************************************************************************/
+
+      /* Add gain and offset to RC inputs to compensate for incorrect input range.
+           Input range required is min of 1000 and max 2000. Some RC systems can't output this range.
+           To correct the signal range, GAIN is applied and then RX_OFFSET is added. 
+
+           RC GAIN = (2000 - 1000) / (measured max signal - measured minimum signal) 
+           RC OFFSET = (2000 - 1000) - (RC GAIN * measured minimum signal)
+
+           Example:
+
+           Min RC Signal = 1050
+           Max RC Signal = 1850
+
+           Gain = (2000 - 1000) / (1850 - 1050) = 1000/800
+           Offset = 1000 - (1000/800 * 1050) = 1000 - 1315 (rounded up) = -312
+           
+           If gain is 1000/800, then SCALE_RC_GAIN_NUM = 1000 (numerator) and SCALE_RC_GAIN_DEN = 800 (denominator)
+           For optimization reasons the denominator must be scaled to 1024. 
+           
+           SCALE_RC_GAIN_NUM = (1024 / denominator) * numerator = (1024 / 800) * 1000 = 1280
+
+           For this example: To scale the RC values, uncomment and set the values as follows.
+
+           #define SCALE_RC
+           #define SCALE_RC_GAIN_NUM 1280
+           #define SCALE_RC_OFFSET -312
+
+           This will result in a range of 1000 to 2000 
+
+           Note: The un-scaled RC signal must still be in the range 900 to 2200. 
+                 The values for SCALE_RC_OFFSET, SCALE_RC_GAIN_NUM integer values.
+                  
+      */ 
+
+       //#define SCALE_RC
+       //#define SCALE_RC_GAIN_NUM 1024
+       //#define SCALE_RC_OFFSET 0
+
 /*************************************************************************************************/
 /*****************                                                                 ***************/
 /****************  SECTION  4 - ALTERNATE CPUs & BOARDS                                    *******/
