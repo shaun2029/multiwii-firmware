@@ -42,6 +42,7 @@ extern uint16_t calibratingB;
 extern uint16_t calibratingG;
 extern int16_t  magHold,headFreeModeHold;
 extern uint8_t  vbatMin;
+extern uint8_t  vbatCellCount;
 extern uint8_t  rcOptions[CHECKBOXITEMS];
 extern int32_t  AltHold;
 extern int16_t  sonarAlt;

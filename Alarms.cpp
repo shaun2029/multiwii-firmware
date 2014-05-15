@@ -101,10 +101,7 @@ void alarmHandler(void){
   #endif
   
   #if defined(VBAT)
-    uint8_t vbatMinCell, vbatCell, vbatCellCount;
-    
-    // Work out how many cells are connected in series.
-    vbatCellCount = (vbatMin / conf.vbatlevel_cell_max) + 1;
+    uint8_t vbatMinCell, vbatCell;
     
     // Calculate cell voltage.
     vbatMinCell = vbatMin / vbatCellCount;

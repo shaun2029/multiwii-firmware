@@ -158,6 +158,7 @@ uint16_t calibratingB = 0;  // baro calibration = get new ground pressure value
 uint16_t calibratingG;
 int16_t  magHold,headFreeModeHold; // [-180;+180]
 uint8_t  vbatMin = VBATNOMINAL;  // lowest battery voltage in 0.1V steps
+uint8_t  vbatCellCount = 0;  // lowest battery voltage in 0.1V steps
 uint8_t  rcOptions[CHECKBOXITEMS];
 int32_t  AltHold; // in cm
 int16_t  sonarAlt;
@@ -724,6 +725,8 @@ void go_arm() {
       magHold = att.heading;
       #if defined(VBAT)
         if (analog.vbat > NO_VBAT) vbatMin = analog.vbat;
+        // Work out how many cells are connected in series.
+        vbatCellCount = (analog.vbat / conf.vbatlevel_cell_max) + 1;   
       #endif
       #ifdef LCD_TELEMETRY // reset some values when arming
         #if BARO
