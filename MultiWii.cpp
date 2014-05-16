@@ -368,7 +368,7 @@ void annexCode() { // this code is excetuted at each loop and won't interfere wi
         rcCommand[axis] = lookupPitchRollRC_DR[tmp2] + ((tmp-(tmp2<<7)) * (lookupPitchRollRC_DR[tmp2+1]-lookupPitchRollRC_DR[tmp2])>>7);
       }
       
-      // If flying in Angle mode disable rate.
+      // If flying in Angle mode disable rate, for 5X beginner mode.
       if (f.ANGLE_MODE) {
         prop1 = 128;
       } else {
@@ -1321,7 +1321,7 @@ void loop () {
   #define GYRO_P_MAX 300
   #define GYRO_I_MAX 250
 
-  // If flying in Angle mode use half yawRate rate.
+  // If flying in Angle mode use half yawRate rate, for 5X beginner mode.
   if (f.ANGLE_MODE) {
     rc = mul(rcCommand[YAW] , (conf.yawRate + 30))  >> 5;
   } else {
