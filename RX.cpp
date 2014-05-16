@@ -6,6 +6,7 @@
 #include "Protocol.h"
 #include "MultiWii.h"
 #include "Alarms.h"
+#include "IMU.h"
 
 /**************************************************************************************/
 /***************             Global RX related variables           ********************/
@@ -409,7 +410,7 @@ uint16_t readRawRC(uint8_t chan) {
   #ifdef SCALE_RC
     int32_t rcData; 
     int16_t rcScale = (int16_t)SCALE_RC_GAIN_NUM;
-    mul(rcData, data, rcScale); // data can safely be treated as a signed int.
+    rcData = mul(data, rcScale); // data can safely be treated as a signed int.
     data = uint16_t(rcData >> 10); // Divide by 1024.
     data += SCALE_RC_OFFSET;
   #endif  
