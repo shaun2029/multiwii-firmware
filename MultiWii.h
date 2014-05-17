@@ -25,8 +25,8 @@
 #define MAXCHECK 1900
 
 //Arm, disarm with 50% YAW D/R for 5X - ShaunS
-#define MINCHECKHALF 1275
-#define MAXCHECKHALF 1725
+#define MINCHECKHALF 1300
+#define MAXCHECKHALF 1695
 
 extern volatile unsigned long timer0_overflow_count;
 

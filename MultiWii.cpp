@@ -871,13 +871,13 @@ void loop () {
           drMode = 0;
         }
         
-        if((rcData[i] < MINCHECKHALF) && (rcData[i] > MINCHECKHALF - 50)) {
+        if((rcData[i] < MINCHECKHALF) && (rcData[i] > MINCHECKHALF - 100)) {
           stTmp &= 0x7F;      // check for D/R 50% MIN
           drMode = 1;
         }
         
         if(rcData[i] > MAXCHECK) stTmp &= 0xBF;      // check for MAX
-        if((rcData[i] > MAXCHECKHALF) && (rcData[i] < MAXCHECKHALF + 50)) stTmp &= 0xBF;      // check for D/R 50% MIN
+        if((rcData[i] > MAXCHECKHALF) && (rcData[i] < MAXCHECKHALF + 100)) stTmp &= 0xBF;      // check for D/R 50% MIN
       } else {
         if(rcData[i] > MINCHECK) stTmp |= 0x80;      // check for MIN
         if(rcData[i] < MAXCHECK) stTmp |= 0x40;      // check for MAX
