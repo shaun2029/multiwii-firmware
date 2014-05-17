@@ -401,9 +401,13 @@
                  The values for SCALE_RC_OFFSET, SCALE_RC_GAIN_NUM must be integer values.                 
       */ 
 
-      #define SCALE_RC
-      #define SCALE_RC_GAIN_NUM 1100
-      #define SCALE_RC_OFFSET -111
+      //#define SCALE_RC
+      //#define SCALE_RC_GAIN_NUM 1024
+      //#define SCALE_RC_OFFSET 0
+      
+      // Uncomment to limit the scaled RC values 
+      //#define RC_SCALE_CONSTRAIN_MIN 1000
+      //#define RC_SCALE_CONSTRAIN_MAX 2000
 
 /*************************************************************************************************/
 /*****************                                                                 ***************/
@@ -613,7 +617,7 @@
     #define FAILSAFE                                // uncomment  to activate the failsafe function
     #define FAILSAFE_DELAY     10                     // Guard time for failsafe activation after signal lost. 1 step = 0.1sec - 1sec in example
     #define FAILSAFE_OFF_DELAY 200                    // Time for Landing before motors stop in 0.1sec. 1 step = 0.1sec - 20sec in example
-    #define FAILSAFE_THROTTLE  (MINTHROTTLE + 150)    // (*) Throttle level used for landing - may be relative to MINTHROTTLE - as in this case
+    #define FAILSAFE_THROTTLE  (MINTHROTTLE + 200)    // (*) Throttle level used for landing - may be relative to MINTHROTTLE - as in this case
     
     #define FAILSAFE_DETECT_TRESHOLD  985
 

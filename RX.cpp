@@ -407,12 +407,15 @@ uint16_t readRawRC(uint8_t chan) {
   #endif
 
   // Scale RC input
-  #ifdef SCALE_RC
+  #if defined(SCALE_RC)
     int32_t rcData; 
     int16_t rcScale = (int16_t)SCALE_RC_GAIN_NUM;
     rcData = mul(data, rcScale); // data can safely be treated as a signed int.
     data = uint16_t(rcData >> 10); // Divide by 1024.
     data += SCALE_RC_OFFSET;
+    #if defined(RC_SCALE_CONSTRAIN_MIN) && defined(RC_SCALE_CONSTRAIN_MAX) 
+      data = constrain(data,1000,2000);
+    #endif  
   #endif  
          
   return data; // We return the value correctly copied when the IRQ's where disabled
