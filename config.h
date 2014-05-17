@@ -401,13 +401,13 @@
                  The values for SCALE_RC_OFFSET, SCALE_RC_GAIN_NUM must be integer values.                 
       */ 
 
-      //#define SCALE_RC
-      //#define SCALE_RC_GAIN_NUM 1024
-      //#define SCALE_RC_OFFSET 0
+      #define SCALE_RC
+      #define SCALE_RC_GAIN_NUM 1204
+      #define SCALE_RC_OFFSET -250
       
       // Uncomment to limit the scaled RC values 
-      //#define RC_SCALE_CONSTRAIN_MIN 1000
-      //#define RC_SCALE_CONSTRAIN_MAX 2000
+      #define RC_SCALE_CONSTRAIN_MIN 1000
+      #define RC_SCALE_CONSTRAIN_MAX 2000
 
 /*************************************************************************************************/
 /*****************                                                                 ***************/
@@ -668,7 +668,7 @@
 
     /* introduce a deadband around the stick center
        Must be greater than zero, comment if you dont want a deadband on roll, pitch and yaw */
-    #define DEADBAND 12
+    #define DEADBAND 24
 
   /**************************************************************************************/
   /***********************                  GPS                **************************/
