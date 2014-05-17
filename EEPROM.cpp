@@ -143,8 +143,8 @@ void LoadDefaults() {
     // do that at the last possible moment, so we can override virtually all defaults and constants
   #else
     #if PID_CONTROLLER == 1
-      conf.pid[ROLL].P8     = 46;  conf.pid[ROLL].I8    = 31; conf.pid[ROLL].D8     = 23;
-      conf.pid[PITCH].P8    = 46; conf.pid[PITCH].I8    = 31; conf.pid[PITCH].D8    = 23;
+      conf.pid[ROLL].P8     = 40;  conf.pid[ROLL].I8    = 31; conf.pid[ROLL].D8     = 23;
+      conf.pid[PITCH].P8    = 40; conf.pid[PITCH].I8    = 31; conf.pid[PITCH].D8    = 23;
       conf.pid[PIDLEVEL].P8 = 90; conf.pid[PIDLEVEL].I8 = 10; conf.pid[PIDLEVEL].D8 = 100;
     #elif PID_CONTROLLER == 2
       conf.pid[ROLL].P8     = 28;  conf.pid[ROLL].I8    = 10; conf.pid[ROLL].D8     = 7;
@@ -163,8 +163,8 @@ void LoadDefaults() {
     conf.pid[PIDVEL].P8 = 0;      conf.pid[PIDVEL].I8 = 0;    conf.pid[PIDVEL].D8 = 0;
 
     conf.rcRate8 = 90; conf.rcExpo8 = 65;
-    conf.rollPitchRate = 36;
-    conf.yawRate = 36;
+    conf.rollPitchRate = 30;
+    conf.yawRate = 30;
     conf.dynThrPID = 0;
     conf.thrMid8 = 50; conf.thrExpo8 = 0;
     for(i=0;i<CHECKBOXITEMS;i++) {conf.activate[i] = 0;}
