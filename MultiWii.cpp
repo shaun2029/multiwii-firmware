@@ -880,11 +880,11 @@ void loop () {
         
         // check for D/R 50% MIN
         if((rcData[i] < MINCHECKHALF) && (rcData[i] > MINCHECKHALF - 100)) {
-          if ((rcYawPos > rcData[i] - 8) && (rcYawPos < rcData[i] + 8)) {
+          if ((rcYawPos > rcData[i] - 2) && (rcYawPos < rcData[i] + 2)) {
             stTmp &= 0x7F;      // Yaw held steady
+          } else {
+            rcYawPos = rcData[i];
           }
-          
-          rcYawPos = rcData[i];
         }
         
         // check for D/R 50% MAX
@@ -894,12 +894,12 @@ void loop () {
         }
         if((rcData[i] > MAXCHECKHALF) && (rcData[i] < MAXCHECKHALF + 100)) 
         {
-          if ((rcYawPos > rcData[i] - 8) && (rcYawPos < rcData[i] + 8)) {
+          if ((rcYawPos > rcData[i] - 2) && (rcYawPos < rcData[i] + 2)) {
             stTmp &= 0xBF;      // Yaw held steady
             drMode = 1;         // D/R 50% enabled  
+          } else {
+            rcYawPos = rcData[i];
           }
-          
-          rcYawPos = rcData[i];
         }
       } else {
         if(rcData[i] > MINCHECK) stTmp |= 0x80;      // check for MIN
@@ -907,7 +907,7 @@ void loop () {
       }
     }
     if(stTmp == rcSticks) {
-      if(rcDelayCommand<500) rcDelayCommand++;
+      if(rcDelayCommand<1500) rcDelayCommand++;
     } else rcDelayCommand = 0;
     rcSticks = stTmp;
     
