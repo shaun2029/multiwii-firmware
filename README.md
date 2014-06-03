@@ -29,3 +29,15 @@ Motor3  ->      D9
 Motor4  ->      D11
 
 
+==============================
+HH-HF-no-magnetometer
+===============================
+
+Changes:
+Mag hold without a magnetometer
+-- renamed Headhold in GUI to differentiate
+-- uses mostly default code, uses much of the current Mag
+   code in IMU.cpp
+-- enables Headfree mode to be used as well, to use uncomment
+   define in config.h (new dev build feature, not mine)
+
