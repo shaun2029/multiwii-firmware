@@ -512,7 +512,7 @@ void annexCode() { // this code is excetuted at each loop and won't interfere wi
       calibratedAccTime = currentTime + 100000;
     } else {
       // End of first calibration - ShaunS
-      if (!f.EVER_ARMED) && (!f.ACC_CALIBRATED) alarmArray[7] = 2; 
+      if ((!f.EVER_ARMED) && (!f.ACC_CALIBRATED)) alarmArray[7] = 2; 
 
       f.ACC_CALIBRATED = 1;
     }
