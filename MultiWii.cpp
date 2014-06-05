@@ -156,6 +156,7 @@ uint16_t cycleTime = 0;     // this is the number in micro second to achieve a f
 uint16_t calibratingA = 0;  // the calibration is done in the main loop. Calibrating decreases at each cycle down to 0, then we enter in a normal mode.
 uint16_t calibratingB = 0;  // baro calibration = get new ground pressure value
 uint16_t calibratingG;
+int8_t   accEverCalibrated = 0; 
 int16_t  magHold,headFreeModeHold; // [-180;+180]
 uint8_t  vbatMin = VBATNOMINAL;  // lowest battery voltage in 0.1V steps
 uint8_t  vbatCellCount = 1;  // Number of battry cells in series
@@ -507,6 +508,13 @@ void annexCode() { // this code is excetuted at each loop and won't interfere wi
       LEDPIN_TOGGLE;
       calibratedAccTime = currentTime + 100000;
     } else {
+      // End of first calibration - ShaunS
+      if (!accEverCalibrated) 
+      {
+        alarmArray[7] = 2; 
+        accEverCalibrated = 1;
+      }
+
       f.ACC_CALIBRATED = 1;
     }
   }
