@@ -377,8 +377,8 @@ void annexCode() { // this code is excetuted at each loop and won't interfere wi
         prop1 = 128;
       } else {
         if (drModeActive) {
-          // For beginner mode 2 (D/R 50% active) increase rate.
-          prop1 = 128-((uint16_t)conf.rollPitchRate*tmp>>8); // prop1 was 100, is 128 now -- and /512 instead of /500
+          // For beginner mode 2 (D/R 50% active) increase rate by 3/2.
+          prop1 = 128-(((uint16_t)conf.rollPitchRate*3>>1)*tmp>>9); // prop1 was 100, is 128 now -- and /512 instead of /500
         } else {
           prop1 = 128-((uint16_t)conf.rollPitchRate*tmp>>9); // prop1 was 100, is 128 now -- and /512 instead of /500
         }
@@ -1361,12 +1361,7 @@ void loop () {
   if (f.ANGLE_MODE) {
     rc = mul(rcCommand[YAW] , (conf.yawRate + 30))  >> 5;
   } else {
-    if (drModeActive) {
-      // For beginner mode 2 (D/R 50% active) increase rate.
-      rc = mul(rcCommand[YAW] , (3*conf.yawRate + 30))  >> 5;
-    } else {
-      rc = mul(rcCommand[YAW] , (2*conf.yawRate + 30))  >> 5;
-    }
+    rc = mul(rcCommand[YAW] , (2*conf.yawRate + 30))  >> 5;
   }
 
   error = rc - imu.gyroData[YAW];
