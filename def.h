@@ -1359,7 +1359,7 @@
   #define ITG3200
   #define BMA180
 //  #define HMC5883 // Disabled to save resources - not useful on a 330 sized Quadcopter
-//  #define BMP085  // Disabled to save resources - not useful, poor sensor 
+  #define BMP085
   #define ACC_ORIENTATION(X, Y, Z) {imu.accADC[ROLL]  = -X; imu.accADC[PITCH]  = -Y; imu.accADC[YAW]  =  Z;} 
   #define GYRO_ORIENTATION(X, Y, Z){imu.gyroADC[ROLL] =  Y; imu.gyroADC[PITCH] = -X; imu.gyroADC[YAW] = -Z;} 
   #define MAG_ORIENTATION(X, Y, Z) {imu.magADC[ROLL]  =  X; imu.magADC[PITCH]  =  Y; imu.magADC[YAW]  = -Z;} 
