@@ -13,54 +13,33 @@ void computeIMU () {
   static int16_t gyroADCprevious[3] = {0,0,0};
   static int16_t gyroADCinter[3];
 
-  //we separate the 2 situations because reading gyro values with a gyro only setup can be acchieved at a higher rate
-  //gyro+nunchuk: we must wait for a quite high delay betwwen 2 reads to get both WM+ and Nunchuk data. It works with 3ms
-  //gyro only: the delay to read 2 consecutive values can be reduced to only 0.65ms
-  #if defined(NUNCHUCK)
-    static uint32_t timeInterleave = 0;
-    annexCode();
-    while((uint16_t)(micros()-timeInterleave)<INTERLEAVING_DELAY) ; //interleaving delay between 2 consecutive reads
-    timeInterleave=micros();
+  uint16_t timeInterleave = 0;
+  #if ACC
     ACC_getADC();
-    getEstimatedAttitude(); // computation time must last less than one interleaving delay
-    while((uint16_t)(micros()-timeInterleave)<INTERLEAVING_DELAY) ; //interleaving delay between 2 consecutive reads
-    timeInterleave=micros();
-    f.NUNCHUKDATA = 1;
-    while(f.NUNCHUKDATA) ACC_getADC(); // For this interleaving reading, we must have a gyro update at this point (less delay)
-
-    for (axis = 0; axis < 3; axis++) {
-      // empirical, we take a weighted value of the current and the previous values
-      // /4 is to average 4 values, note: overflow is not possible for WMP gyro here
-      imu.gyroData[axis] = (imu.gyroADC[axis]*3+gyroADCprevious[axis])>>2;
-      gyroADCprevious[axis] = imu.gyroADC[axis];
-    }
-  #else
-    uint16_t timeInterleave = 0;
-    #if ACC
-      ACC_getADC();
-      getEstimatedAttitude();
-    #endif
-    #if GYRO
-      Gyro_getADC();
-    #endif
-    for (axis = 0; axis < 3; axis++)
-      gyroADCinter[axis] =  imu.gyroADC[axis];
-    timeInterleave=micros();
-    annexCode();
-    uint8_t t=0;
-    while((int16_t)(micros()-timeInterleave)<650) t=1; //empirical, interleaving delay between 2 consecutive reads
-    if (!t) annex650_overrun_count++;
-    #if GYRO
-      Gyro_getADC();
-    #endif
-    for (axis = 0; axis < 3; axis++) {
-      gyroADCinter[axis] =  imu.gyroADC[axis]+gyroADCinter[axis];
-      // empirical, we take a weighted value of the current and the previous values
-      imu.gyroData[axis] = (gyroADCinter[axis]+gyroADCprevious[axis])/3;
-      gyroADCprevious[axis] = gyroADCinter[axis]>>1;
-      if (!ACC) imu.accADC[axis]=0;
-    }
+    getEstimatedAttitude();
   #endif
+  #if GYRO
+    Gyro_getADC();
+  #endif
+  for (axis = 0; axis < 3; axis++)
+    gyroADCinter[axis] =  imu.gyroADC[axis];
+  timeInterleave=micros();
+  annexCode();
+  uint8_t t=0;
+  while((int16_t)(micros()-timeInterleave)<650) t=1; //empirical, interleaving delay between 2 consecutive reads
+  #ifdef LCD_TELEMETRY
+    if (!t) annex650_overrun_count++;
+  #endif
+  #if GYRO
+    Gyro_getADC();
+  #endif
+  for (axis = 0; axis < 3; axis++) {
+    gyroADCinter[axis] =  imu.gyroADC[axis]+gyroADCinter[axis];
+    // empirical, we take a weighted value of the current and the previous values
+    imu.gyroData[axis] = (gyroADCinter[axis]+gyroADCprevious[axis])/3;
+    gyroADCprevious[axis] = gyroADCinter[axis]>>1;
+    if (!ACC) imu.accADC[axis]=0;
+  }
   #if defined(GYRO_SMOOTHING)
     static int16_t gyroSmooth[3] = {0,0,0};
     for (axis = 0; axis < 3; axis++) {
@@ -215,7 +194,12 @@ void getEstimatedAttitude(){
   int32_t accMag = 0;
   float scale;
   int16_t deltaGyroAngle16[3];
-  static t_int32_t_vector EstG,EstM;
+  static t_int32_t_vector EstG = {0,0,(int32_t)ACC_1G<<16};
+  #if MAG
+    static t_int32_t_vector EstM;
+  #else
+    static t_int32_t_vector EstM = {0,(int32_t)1<<24,0};
+  #endif
   static uint32_t LPFAcc[3];
   float invG; // 1/|G|
   static int16_t accZoffset = 0;
@@ -244,9 +228,7 @@ void getEstimatedAttitude(){
   // however, only the first 16 MSB of the 32 bit vector is used to compute the result
   // it is ok to use this approximation as the 16 LSB are used only for the complementary filter part
   rotateV32(&EstG,deltaGyroAngle16);
-  #if MAG
-    rotateV32(&EstM,deltaGyroAngle16);
-  #endif
+  rotateV32(&EstM,deltaGyroAngle16);
 
   // Apply complimentary filter (Gyro drift correction)
   // If accel magnitude >1.15G or <0.85G and ACC vector outside of the limit range => we neutralize the effect of accelerometers in the angle estimation.
@@ -271,14 +253,14 @@ void getEstimatedAttitude(){
   att.angle[ROLL]  = _atan2(EstG.V16.X , EstG.V16.Z);
   att.angle[PITCH] = _atan2(EstG.V16.Y , InvSqrt(sqGX_sqGZ)*sqGX_sqGZ);
 
+  //note on the second term: mathematically there is a risk of overflow (16*16*16=48 bits). assumed to be null with real values
+  att.heading = _atan2(
+    mul(EstM.V16.Z , EstG.V16.X) - mul(EstM.V16.X , EstG.V16.Z),
+    (EstM.V16.Y * sqGX_sqGZ  - (mul(EstM.V16.X , EstG.V16.X) + mul(EstM.V16.Z , EstG.V16.Z)) * EstG.V16.Y)*invG );
   #if MAG
-    //note on the second term: mathematically there is a risk of overflow (16*16*16=48 bits). assumed to be null with real values
-    att.heading = _atan2(
-      mul(EstM.V16.Z , EstG.V16.X) - mul(EstM.V16.X , EstG.V16.Z),
-      (EstM.V16.Y * sqGX_sqGZ  - (mul(EstM.V16.X , EstG.V16.X) + mul(EstM.V16.Z , EstG.V16.Z)) * EstG.V16.Y)*invG );
     att.heading += conf.mag_declination; // Set from GUI
-    att.heading /= 10;
   #endif
+  att.heading /= 10;
 
   #if defined(THROTTLE_ANGLE_CORRECTION)
     cosZ = mul(EstG.V16.Z , 100) / ACC_1G ;                                                   // cos(angleZ) * 100 

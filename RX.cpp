@@ -95,7 +95,7 @@ void configureReceiver() {
   #if defined(SERIAL_SUM_PPM)
     PPM_PIN_INTERRUPT; 
   #endif
-  #if defined (SPEKTRUM)
+  #if defined (SPEKTRUM) || defined(SUMD)
     SerialOpen(RX_SERIAL_PORT,115200);
   #endif
   #if defined(SBUS)
@@ -310,7 +310,7 @@ void configureReceiver() {
 static uint16_t sbusIndex=0;
 static uint16_t sbus[25]={0};
 
-void  readSBus(){
+void readSerial_RX(){
   while(SerialAvailable(RX_SERIAL_PORT)){
     int val = SerialRead(RX_SERIAL_PORT);
     if(sbusIndex==0 && val != SBUS_SYNCBYTE)
@@ -346,17 +346,64 @@ void  readSBus(){
       if (!((sbus[23] >> 3) & 0x0001))
         {if(failsafeCnt > 20) failsafeCnt -= 20; else failsafeCnt = 0;}   // clear FailSafe counter
       #endif
+
+      // For some reason the SBUS data provides only about 75% of the actual RX output pulse width
+      // Adjust the actual value by +/-25%.  Sign determined by pulse width above or below center
+      uint8_t adj_index;
+      for(adj_index=0; adj_index<16; adj_index++) {
+        if (rcValue[adj_index] < MIDRC)
+          rcValue[adj_index] -= (MIDRC - rcValue[adj_index]) >> 2;
+        else
+          rcValue[adj_index] += (rcValue[adj_index] - MIDRC) >> 2;
+      }
     }
   }        
 }
 #endif
 
+/**************************************************************************************/
+/*************** SUMD ********************/
+/**************************************************************************************/
+
+#if defined(SUMD)
+#define SUMD_SYNCBYTE 0xA8
+#define SUMD_MAXCHAN 8
+#define SUMD_BUFFSIZE SUMD_MAXCHAN*2 + 5 // 6 channels + 5 -> 17 bytes for 6 channels
+static uint8_t sumdIndex=0;
+static uint8_t sumdSize=0;
+static uint8_t sumd[SUMD_BUFFSIZE]={0};
+
+void readSerial_RX(void) {
+  while (SerialAvailable(RX_SERIAL_PORT)) {
+    int val = SerialRead(RX_SERIAL_PORT);
+    if(sumdIndex == 0 && val != SUMD_SYNCBYTE) continue;
+    if(sumdIndex == 2) sumdSize = val;
+    if(sumdIndex < SUMD_BUFFSIZE) sumd[sumdIndex] = val;
+    sumdIndex++;
+
+    if(sumdIndex == sumdSize*2+5) {
+      sumdIndex = 0;
+      spekFrameFlags = 0x00;
+      debug[1] = sumd[1];
+      if (sumdSize > SUMD_MAXCHAN) sumdSize = SUMD_MAXCHAN;
+      for (uint8_t b = 0; b < sumdSize; b++)
+        rcValue[b] = ((sumd[2*b+3]<<8) | sumd[2*b+4])>>3;
+      spekFrameDone = 0x01; // havent checked crc at all
+
+      #if defined(FAILSAFE)
+      if (sumd[1] == 0x01)
+        {if(failsafeCnt > 20) failsafeCnt -= 20; else failsafeCnt = 0;} // clear FailSafe counter
+      #endif
+    }
+  }
+}
+#endif
 
 /**************************************************************************************/
 /***************          combine and sort the RX Datas            ********************/
 /**************************************************************************************/
 #if defined(SPEKTRUM)
-void readSpektrum(void) {
+void readSerial_RX(void) {
   if ((!f.ARMED) && 
      #if defined(FAILSAFE) || (RX_SERIAL_PORT != 0) 
         (failsafeCnt > 5) &&
@@ -395,7 +442,7 @@ void readSpektrum(void) {
 
 uint16_t readRawRC(uint8_t chan) {
   uint16_t data;
-  #if defined(SPEKTRUM) || defined(SBUS)
+  #if defined(SPEKTRUM) || defined(SBUS) || defined(SUMD)
     if (chan < RC_CHANS) {
       data = rcValue[rcChannel[chan]];
     } else data = 1500;
@@ -440,7 +487,7 @@ void computeRC() {
       #if defined(FAILSAFE)
         failsafeGoodCondition = rcDataTmp>FAILSAFE_DETECT_TRESHOLD || chan > 3 || !f.ARMED; // update controls channel only if pulse is above FAILSAFE_DETECT_TRESHOLD
       #endif                                                                                // In disarmed state allow always update for easer configuration.
-      #if defined(SPEKTRUM) || defined(SBUS) // no averaging for Spektrum & SBUS signal
+      #if defined(SPEKTRUM) || defined(SBUS) || defined(SUMD) // no averaging for Spektrum & SBUS & SUMD signal
         if(failsafeGoodCondition)  rcData[chan] = rcDataTmp;
       #else
         if(failsafeGoodCondition) {
