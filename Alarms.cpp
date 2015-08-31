@@ -101,10 +101,14 @@ void alarmHandler(void){
   #endif
   
   #if defined(VBAT)
-    if (vbatMin < conf.vbatlevel_crit) alarmArray[ALRM_FAC_VBAT] = ALRM_LVL_VBAT_CRIT;
-    else if ( (analog.vbat > conf.vbatlevel_warn1)  || (NO_VBAT > analog.vbat)) alarmArray[ALRM_FAC_VBAT] = ALRM_LVL_OFF;
-    else if (analog.vbat > conf.vbatlevel_warn2) alarmArray[ALRM_FAC_VBAT] = ALRM_LVL_VBAT_INFO;
-    else if (analog.vbat > conf.vbatlevel_crit) alarmArray[ALRM_FAC_VBAT] = ALRM_LVL_VBAT_WARN;
+    uint8_t vbatWarn1 = conf.vbatlevel_warn1 * vbatCellCount;
+    uint8_t vbatWarn2 = conf.vbatlevel_warn2 * vbatCellCount;
+    uint8_t vbatCrit = conf.vbatlevel_crit * vbatCellCount;
+  
+    if (vbatMin < vbatCrit) alarmArray[ALRM_FAC_VBAT] = ALRM_LVL_VBAT_CRIT;
+    else if ( (analog.vbat > vbatWarn1)  || (NO_VBAT > analog.vbat)) alarmArray[ALRM_FAC_VBAT] = ALRM_LVL_OFF;
+    else if (analog.vbat > vbatWarn2) alarmArray[ALRM_FAC_VBAT] = ALRM_LVL_VBAT_INFO;
+    else if (analog.vbat > vbatCrit) alarmArray[ALRM_FAC_VBAT] = ALRM_LVL_VBAT_WARN;
     //else alarmArray[6] = 4;
   #endif
   

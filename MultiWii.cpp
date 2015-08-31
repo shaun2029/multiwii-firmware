@@ -164,9 +164,6 @@ int8_t   accEverCalibrated = 0;
 int16_t  magHold,headFreeModeHold; // [-180;+180]
 uint8_t  vbatMin = VBATNOMINAL;  // lowest battery voltage in 0.1V steps
 uint8_t  vbatCellCount = 1;  // Number of battry cells in series
-uint8_t  vbatWarn1 = conf.vbatlevel_warn1;
-uint8_t  vbatWarn2 = conf.vbatlevel_warn2;
-uint8_t  vbatCrit = conf.vbatlevel_crit;
 uint8_t  rcOptions[CHECKBOXITEMS];
 int32_t  AltHold; // in cm
 int16_t  sonarAlt;
@@ -807,10 +804,6 @@ void go_arm() {
         if (analog.vbat > NO_VBAT) vbatMin = analog.vbat;
         // Work out how many cells are connected in series.
         vbatCellCount = (analog.vbat / conf.vbatlevel_cell_max) + 1;
-        
-        vbatWarn1 = conf.vbatlevel_warn1 * vbatCellCount;
-        vbatWarn2 = conf.vbatlevel_warn2 * vbatCellCount;
-        vbatCrit = conf.vbatlevel_crit * vbatCellCount;
       #endif
       #ifdef ALTITUDE_RESET_ON_ARM
         #if BARO
