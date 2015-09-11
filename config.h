@@ -563,8 +563,8 @@ At this moment you can use this function only with WinGUI 2.3 release. MultiWiiC
       //#define GYRO_LPF_256HZ     // This is the default setting, no need to uncomment, just for reference
       //#define GYRO_LPF_188HZ
       //#define GYRO_LPF_98HZ
-      //#define GYRO_LPF_42HZ
-      #define GYRO_LPF_20HZ
+      #define GYRO_LPF_42HZ
+      //#define GYRO_LPF_20HZ
       //#define GYRO_LPF_10HZ
       //#define GYRO_LPF_5HZ       // Use this only in extreme cases, rather change motors and/or props -- setting not available on ITG3200
 
@@ -593,13 +593,13 @@ At this moment you can use this function only with WinGUI 2.3 release. MultiWiiC
 
   /************************        Reset Baro altitude on arm         ********************/
   /* When unchecked a calibration of the baro altitude is preformed every time arming is activated */
-  //#define ALTITUDE_RESET_ON_ARM
+  #define ALTITUDE_RESET_ON_ARM
 
   /************************        Angele throttle correction         ********************/
   /* Automatically increase throttle based on the angle of the copter
      Original idea by Kraut Rob, first implementation HAdrian */
 
-  //#define THROTTLE_ANGLE_CORRECTION 40
+  #define THROTTLE_ANGLE_CORRECTION 20
   
   /*** HEADFREE : the copter can be controled by an absolute stick orientation, whatever the yaw orientation ***/
   //#define HEADFREE
