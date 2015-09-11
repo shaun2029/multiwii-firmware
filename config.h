@@ -1225,6 +1225,15 @@ Also note, that maqgnetic declination changes with time, so recheck your value e
         */
     //#define COPTERTEST 1
 
+
+  /********************************************************************/
+  /****           Dynamic Rate Control                             ****/
+  /********************************************************************/
+
+  /* Uses AUX 2 level to set rollPitchRate */
+  
+    #define AUX2_ROLLPITCHRATE_CONTROL
+
 /*************************************************************************************************/
 /*****************                                                                 ***************/
 /****************  SECTION  8 - DEPRECATED                                                 *******/

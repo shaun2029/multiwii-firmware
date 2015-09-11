@@ -416,7 +416,20 @@ void annexCode() { // this code is excetuted at each loop and won't interfere wi
           // For beginner mode 2 (D/R 50% active) increase rate by 3/2.
           prop1 = 128-(((uint16_t)conf.rollPitchRate*3>>1)*tmp>>9); // prop1 was 100, is 128 now -- and /512 instead of /500
         } else {
-          prop1 = 128-((uint16_t)conf.rollPitchRate*tmp>>9); // prop1 was 100, is 128 now -- and /512 instead of /500
+
+          #ifdef AUX2_ROLLPITCHRATE_CONTROL
+          
+          uint8_t rollPitchRate;
+          
+          if (rcData[AUX2] > 1200) {
+            rollPitchRate = ((rcData[AUX2] - 1000) / 8);
+          } else rollPitchRate = conf.rollPitchRate;
+          
+          prop1 = 128-((uint16_t)rollPitchRate*tmp>>9); // prop1 was 100, is 128 now -- and /512 instead of /500          
+          #else
+          prop1 = 128-((uint16_t)conf.rollPitchRate*tmp>>9); // prop1 was 100, is 128 now -- and /512 instead of /500          
+          #endif
+
         }
       }
       
@@ -794,6 +807,14 @@ void go_arm() {
   #endif
     ) {
     if(!f.ARMED && !f.BARO_MODE) { // arm now!
+/*
+if (rcData[AUX1] > 1200) { 
+conf.pid[PIDALT].D8 = ((rcData[AUX2] - 1000) / 20);
+} else {
+conf.pid[PIDALT].P8 = ((rcData[AUX2] - 1000) / 10);
+}
+*/
+      
       f.ARMED = 1;
       f.EVER_ARMED = 1;
       #if defined(HEADFREE)
