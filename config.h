@@ -1230,9 +1230,9 @@ Also note, that maqgnetic declination changes with time, so recheck your value e
   /****           Dynamic Rate Control                             ****/
   /********************************************************************/
 
-  /* Uses AUX 2 level to set rollPitchRate */
+  /* Uses channel to set rollPitchRate */
   
-    #define AUX2_ROLLPITCHRATE_CONTROL
+    #define DYNAMIC_ROLLPITCHRATE_CONTROL AUX2
 
 /*************************************************************************************************/
 /*****************                                                                 ***************/
